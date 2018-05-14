@@ -1,4 +1,4 @@
-#THEMIS-OTC
+# THEMIS-OTC
 ```
 Themis: The Decentralized "Alipay" in the Digital Currency World
 From decentralized digital currency to decentralized digital commerce
@@ -8,7 +8,7 @@ providing a decentralized escrow service for digital currencies
 and solving the problems of fair exchanges using digital currencies as medium.
 Themis can be applied in P2P payments of digital currency,OTC trading of digital currency and so on.
 ```
-##MODULES:
+## MODULES:
 ### themis-user 
 ```
 user center
