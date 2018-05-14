@@ -8,7 +8,6 @@ providing a decentralized escrow service for digital currencies
 and solving the problems of fair exchanges using digital currencies as medium.
 Themis can be applied in P2P payments of digital currency,OTC trading of digital currency and so on.
 ```
-
 ##MODULES:
 ### themis-user 
 ```
