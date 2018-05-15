@@ -10,7 +10,6 @@ target/
 .springBeans
 
 ### BackEnd ###
-BackEnd/.idea/**
 BackEnd/.idea
 BackEnd/*.iws
 BackEnd/*.iml
