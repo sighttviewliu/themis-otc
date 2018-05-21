@@ -1,5 +1,6 @@
 package com.oxchains.themis.zuul.rest;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,9 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class ZuulController {
-    @RequestMapping(value = "/info")
-    @ResponseBody
-    public String info(){
-        return "This is zuul!";
+
+    @GetMapping(value = "/infos")
+    public String welcome(){
+        return "Welcome to themis zuul!";
     }
 }

@@ -2,14 +2,15 @@ package com.oxchains.themis.zuul;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import com.oxchains.themis.repo.dao.UserDao;
 import com.oxchains.themis.zuul.service.ParseService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author ccl
@@ -17,11 +18,13 @@ import javax.servlet.http.HttpServletRequest;
  * @name AccessFilter
  * @desc:
  */
-
+@Slf4j
 @Component
-public class AccessFilter extends ZuulFilter{
+public class AccessFilter extends ZuulFilter {
 
-    private final Logger LOG = LoggerFactory.getLogger(AccessFilter.class);
+    private static String urlWhitelistString;
+
+    private static ArrayList<String> urlWhitelist;
 
     @Resource
     private ParseService parseService;
@@ -61,44 +64,74 @@ public class AccessFilter extends ZuulFilter{
         try {
             RequestContext rcx = RequestContext.getCurrentContext();
             HttpServletRequest request = rcx.getRequest();
+
+            log.info("Send {} Request to {}", request.getMethod(),request.getRequestURL());
+
             String url = request.getRequestURI();
-
-            //String token = request.getParameter("Authorization");
+            boolean inWhitelist = isWhiteUrl(url);
             String token = request.getHeader("Authorization");
-//        LOG.log(Level.FINE,"Authorization token: {}",token);
-            if(null == token){
-                LOG.info("当前请求没有携带 TOKEN");
-                if("/themis-user/user/login".equals(url) || "themis-user/user/register".equals(url)){
-                    LOG.info("请求有效，放行");
-                }else {
+            log.info("Authorization: {}", token);
+            if (null == token) {
+                log.info("This Request Without TOKEN");
+                if (inWhitelist) {
+                    log.info("URL: {} in whitelist", url);
+                } else {
                     //过滤该请求，不往下级服务去转发请求，到此结束
-                    rcx.setSendZuulResponse(false);
-                    rcx.setResponseStatusCode(401);
-                    rcx.setResponseBody("{}");
-                    LOG.error("请求无效");
+                    response401(rcx);
                     return null;
-
                 }
             } else {
-                LOG.info("当前请求携带 TOKEN ：{}" , token);
+                log.info("This Request contains TOKEN ：{}", token);
                 boolean isSuccess = parseService.parse(token);
-                if (isSuccess){
-                    LOG.info("请求有效，放行");
+                if (isSuccess || inWhitelist) {
+                    log.info("Request Success");
                 } else {
-                    rcx.setSendZuulResponse(false);
-                    rcx.setResponseStatusCode(401);
-                    rcx.setResponseBody("{}");
-                    LOG.error("请求无效");
+                    response401(rcx);
                     return null;
                 }
             }
             //如果有token，则进行路由转发
-            LOG.info("Authorized,continue...");
+            log.info("Authorized,continue...");
             //这里return的值没有意义，zuul框架没有使用该返回值
             return null;
-        }catch (Exception e){
-            LOG.error("Zuul filter 异常", e);
+        } catch (Exception e) {
+            log.error("Zuul filter 异常", e);
         }
         return null;
+    }
+
+    private void response401(RequestContext rcx){
+        rcx.setSendZuulResponse(false);
+        rcx.setResponseStatusCode(401);
+        rcx.setResponseBody("{}");
+        log.error("请求无效");
+    }
+
+    private boolean isWhiteUrl(String str){
+        if(null == str || "".equals(str.trim()) || null == AccessFilter.urlWhitelist || AccessFilter.urlWhitelist.size()<1){
+            return false;
+        }
+        for(String url : AccessFilter.urlWhitelist){
+            if(str.equals(url) || str.contains(url)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String getUrlWhitelistString() {
+        return urlWhitelistString;
+    }
+
+    @Value("${themis.zuul.url.whitelist}")
+    public void setUrlWhitelistString(String urlWhitelistString) {
+        AccessFilter.urlWhitelistString = urlWhitelistString;
+
+        AccessFilter.urlWhitelist = new ArrayList<>();
+        String[] urls = AccessFilter.urlWhitelistString.split(",");
+        for(String url : urls){
+            AccessFilter.urlWhitelist.add(url);
+        }
+
     }
 }
