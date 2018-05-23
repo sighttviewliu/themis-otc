@@ -10,25 +10,22 @@ import com.oxchains.themis.message.rest.dto.MessageDTO;
 import com.oxchains.themis.message.rest.dto.PageDTO;
 import com.oxchains.themis.message.rest.dto.UnReadSizeDTO;
 import com.oxchains.themis.repo.dao.OrderDao;
-import com.oxchains.themis.repo.dao.UserDao;
+import com.oxchains.themis.repo.dao.user.UserDao;
 import com.oxchains.themis.repo.entity.Message;
 import com.oxchains.themis.repo.entity.MessageText;
 import com.oxchains.themis.repo.entity.Order;
-import com.oxchains.themis.repo.entity.User;
+import com.oxchains.themis.repo.entity.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.thymeleaf.processor.ITextNodeProcessorMatcher;
 
 import javax.annotation.Resource;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 

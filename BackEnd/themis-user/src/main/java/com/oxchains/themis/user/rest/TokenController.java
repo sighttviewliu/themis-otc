@@ -2,7 +2,7 @@ package com.oxchains.themis.user.rest;
 
 import com.oxchains.themis.common.auth.JwtService;
 import com.oxchains.themis.common.model.RestResp;
-import com.oxchains.themis.repo.entity.User;
+import com.oxchains.themis.repo.entity.user.User;
 import com.oxchains.themis.user.service.UserService;
 
 import org.springframework.web.bind.annotation.PostMapping;

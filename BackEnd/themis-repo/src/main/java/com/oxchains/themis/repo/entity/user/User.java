@@ -1,9 +1,8 @@
-package com.oxchains.themis.repo.entity;
+package com.oxchains.themis.repo.entity.user;
 
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
-import java.util.Date;
 
 /**
  * @author ccl

@@ -1,6 +1,5 @@
 package com.oxchains.themis.chat.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.oxchains.themis.chat.entity.ChatContent;
 import com.oxchains.themis.chat.entity.UploadTxIdPojo;
@@ -9,12 +8,11 @@ import com.oxchains.themis.chat.websocket.ChannelHandler;
 import com.oxchains.themis.common.constant.ThemisUserAddress;
 import com.oxchains.themis.common.model.RestResp;
 import com.oxchains.themis.common.util.JsonUtil;
-import com.oxchains.themis.repo.entity.User;
+import com.oxchains.themis.repo.entity.user.User;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.stereotype.Service;

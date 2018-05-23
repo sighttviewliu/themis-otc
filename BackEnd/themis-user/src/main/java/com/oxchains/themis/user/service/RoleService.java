@@ -1,7 +1,7 @@
 package com.oxchains.themis.user.service;
 
-import com.oxchains.themis.repo.dao.RoleDao;
-import com.oxchains.themis.repo.entity.Role;
+import com.oxchains.themis.repo.dao.user.RoleDao;
+import com.oxchains.themis.repo.entity.user.Role;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

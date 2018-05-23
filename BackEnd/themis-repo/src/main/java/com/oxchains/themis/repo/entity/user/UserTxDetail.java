@@ -1,4 +1,4 @@
-package com.oxchains.themis.repo.entity;
+package com.oxchains.themis.repo.entity.user;
 
 import lombok.Data;
 

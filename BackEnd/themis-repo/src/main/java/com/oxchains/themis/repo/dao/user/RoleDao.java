@@ -1,6 +1,6 @@
-package com.oxchains.themis.repo.dao;
+package com.oxchains.themis.repo.dao.user;
 
-import com.oxchains.themis.repo.entity.Role;
+import com.oxchains.themis.repo.entity.user.Role;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

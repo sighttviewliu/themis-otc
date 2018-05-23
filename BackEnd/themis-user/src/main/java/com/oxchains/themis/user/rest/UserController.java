@@ -3,35 +3,29 @@ package com.oxchains.themis.user.rest;
 
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.common.net.HttpHeaders;
-import com.oxchains.basicService.files.tfsService.TFSConsumer;
 import com.oxchains.themis.common.constant.Status;
 import com.oxchains.themis.common.model.RestResp;
 import com.oxchains.themis.common.param.ParamType;
 import com.oxchains.themis.common.param.VerifyCode;
-import com.oxchains.themis.common.util.ImageBase64;
 import com.oxchains.themis.common.util.JsonUtil;
 import com.oxchains.themis.common.util.RegexUtils;
 import com.oxchains.themis.common.util.VerifyCodeUtils;
 
-import com.oxchains.themis.repo.entity.User;
-import com.oxchains.themis.repo.entity.UserRelation;
+import com.oxchains.themis.repo.entity.user.User;
+import com.oxchains.themis.repo.entity.user.UserRelation;
 import com.oxchains.themis.user.service.UserService;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.nio.file.Files;

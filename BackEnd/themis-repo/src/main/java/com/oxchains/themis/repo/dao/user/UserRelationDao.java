@@ -1,12 +1,10 @@
-package com.oxchains.themis.repo.dao;
+package com.oxchains.themis.repo.dao.user;
 
-import com.oxchains.themis.repo.entity.UserRelation;
+import com.oxchains.themis.repo.entity.user.UserRelation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 /**
  * @author ccl

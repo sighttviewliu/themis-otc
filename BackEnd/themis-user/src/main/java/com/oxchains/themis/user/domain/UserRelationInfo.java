@@ -1,7 +1,7 @@
 package com.oxchains.themis.user.domain;
 
-import com.oxchains.themis.repo.entity.User;
-import com.oxchains.themis.repo.entity.UserRelation;
+import com.oxchains.themis.repo.entity.user.User;
+import com.oxchains.themis.repo.entity.user.UserRelation;
 
 /**
  * @author oxchains

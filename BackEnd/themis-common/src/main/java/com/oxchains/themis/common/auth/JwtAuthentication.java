@@ -1,6 +1,6 @@
 package com.oxchains.themis.common.auth;
 
-import com.oxchains.themis.repo.entity.User;
+import com.oxchains.themis.repo.entity.user.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 

@@ -11,7 +11,15 @@ import com.oxchains.themis.common.param.RequestBody;
 import com.oxchains.themis.common.param.VerifyCode;
 import com.oxchains.themis.common.util.*;
 import com.oxchains.themis.repo.dao.*;
+import com.oxchains.themis.repo.dao.user.RoleDao;
+import com.oxchains.themis.repo.dao.user.UserDao;
+import com.oxchains.themis.repo.dao.user.UserRelationDao;
+import com.oxchains.themis.repo.dao.user.UserTxDetailDao;
 import com.oxchains.themis.repo.entity.*;
+import com.oxchains.themis.repo.entity.user.Role;
+import com.oxchains.themis.repo.entity.user.User;
+import com.oxchains.themis.repo.entity.user.UserRelation;
+import com.oxchains.themis.repo.entity.user.UserTxDetail;
 import com.oxchains.themis.user.domain.UserRelationInfo;
 import com.oxchains.themis.user.domain.UserTrust;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +32,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 

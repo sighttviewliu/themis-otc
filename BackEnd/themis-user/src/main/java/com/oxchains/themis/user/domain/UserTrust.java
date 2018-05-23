@@ -1,8 +1,5 @@
 package com.oxchains.themis.user.domain;
 
-import com.oxchains.themis.repo.entity.UserRelation;
-import com.oxchains.themis.repo.entity.UserTxDetail;
-
 /**
  * @author ccl
  * @time 2017-11-06 10:32
