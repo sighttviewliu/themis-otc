@@ -1,4 +1,4 @@
-package com.themis.blockinfo;
+package com.oxchains.themis;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

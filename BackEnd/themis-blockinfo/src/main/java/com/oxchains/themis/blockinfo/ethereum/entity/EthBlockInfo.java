@@ -1,4 +1,4 @@
-package com.themis.blockinfo.ethereum.entity;
+package com.oxchains.themis.blockinfo.ethereum.entity;
 
 import lombok.Data;
 import org.web3j.protocol.core.methods.response.EthBlock;
@@ -15,8 +15,8 @@ import java.util.List;
  */
 @Data
 @Entity
-@Table(name = "block_info")
-public class BlockInfo{
+@Table(name = "eth_block_info")
+public class EthBlockInfo{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -48,8 +48,8 @@ public class BlockInfo{
     @Transient
     private List<String> sealFields;
 
-    public static BlockInfo block2BlockInfo(EthBlock.Block block){
-        BlockInfo blockInfo = new BlockInfo();
+    public static EthBlockInfo block2BlockInfo(EthBlock.Block block){
+        EthBlockInfo blockInfo = new EthBlockInfo();
         blockInfo.setNumber(block.getNumber());
         blockInfo.setHash(block.getHash());
         blockInfo.setParentHash(block.getParentHash());
@@ -68,11 +68,11 @@ public class BlockInfo{
         blockInfo.setSize(block.getSize()==null?null:block.getSize().intValue());
         blockInfo.setGasLimit(block.getGasLimit());
         blockInfo.setGasUsed(block.getGasUsed());
-        blockInfo.setTimestamp(block.getTimestamp()==null?null:block.getTimestamp().longValue());
+        blockInfo.setTimestamp(block.getTimestamp()==null?null:block.getTimestamp().longValue()*1000);
 
         return blockInfo;
     }
 
-    public BlockInfo() {
+    public EthBlockInfo() {
     }
 }

@@ -1,4 +1,4 @@
-package com.themis.blockinfo;
+package com.oxchains.themis.blockinfo;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

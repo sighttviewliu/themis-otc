@@ -1,4 +1,4 @@
-package com.themis.blockinfo.ethereum;
+package com.oxchains.themis.blockinfo;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
