@@ -12,7 +12,7 @@ import javax.persistence.*;
  **/
 @Entity
 @Data
-@Table(name = "bci_cny")
+@Table(name = "btc_cny")
 public class CNYDetail {
 
     @Id

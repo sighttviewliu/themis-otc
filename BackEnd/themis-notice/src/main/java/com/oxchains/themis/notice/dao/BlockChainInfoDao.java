@@ -13,5 +13,5 @@ import java.util.List;
 @Repository
 public interface BlockChainInfoDao extends CrudRepository<BlockChainInfo, Long> {
 
-    List<BlockChainInfo> findBySymbol(String symbol);
+    BlockChainInfo findBySymbol(String symbol);
 }

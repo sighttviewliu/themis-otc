@@ -55,15 +55,15 @@ public class BlockChainInfoListener {
                 String buy = blockChainInfo.getCNY().getBuy();
                 String sell = blockChainInfo.getCNY().getSell();
 
-                List<BlockChainInfo> bciList = blockChainInfoDao.findBySymbol("¥");
+                BlockChainInfo bciInfo = blockChainInfoDao.findBySymbol("¥");
                 CNYDetail cnyDetail = cnyDetailDao.findBySymbol("¥");
-                if (bciList.size() != 0 && cnyDetail != null){
+                if (bciInfo != null && cnyDetail != null){
                     if (VerifyNumUtil.isNumber(last) && VerifyNumUtil.isNumber(buy) && VerifyNumUtil.isNumber(sell)){
-                        for (BlockChainInfo b : bciList) {
-                            b.setSaveTime(currentTime);
-                            b.setSymbol("¥");
-                            blockChainInfoDao.save(b);
-                        }
+//                        for (BlockChainInfo b : bciList) {
+                            bciInfo.setSaveTime(currentTime);
+                            bciInfo.setSymbol("¥");
+                            blockChainInfoDao.save(bciInfo);
+//                        }
                         cnyDetail.setSaveTime(currentTime);
                         cnyDetail.setBuy(blockChainInfo.getCNY().getBuy());
                         cnyDetail.setLast(blockChainInfo.getCNY().getLast());
