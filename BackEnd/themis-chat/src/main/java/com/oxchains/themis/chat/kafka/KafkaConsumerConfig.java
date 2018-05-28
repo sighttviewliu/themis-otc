@@ -19,6 +19,7 @@ import java.util.Map;
 
 /**
  * create by huohuo
+ *
  * @author huohuo
  */
 @Configuration
@@ -29,6 +30,7 @@ public class KafkaConsumerConfig {
     private String kafkaSeerviceConfig;
     @Value("${kafka.chat.group}")
     private String kafkaGroup;
+
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();

@@ -15,6 +15,7 @@ import java.util.Map;
 
 /**
  * create by huohuo
+ *
  * @author huohuo
  */
 @Configuration
@@ -22,6 +23,7 @@ import java.util.Map;
 public class KafkaProducerConfig {
     @Value("${kafka.service.config}")
     private String kafkaSeerviceConfig;
+
     public Map<String, Object> producerConfigs() {
         Map<String, Object> props = new HashMap<>(10);
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaSeerviceConfig);

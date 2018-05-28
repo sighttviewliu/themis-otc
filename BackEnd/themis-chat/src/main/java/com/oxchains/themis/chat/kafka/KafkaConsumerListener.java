@@ -14,6 +14,7 @@ import java.util.Optional;
 
 /**
  * create by huohuo
+ *
  * @author huohuo
  */
 @Component
@@ -21,7 +22,11 @@ public class KafkaConsumerListener {
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
     @Resource
     private MongoRepo mongoRepo;
-    public KafkaConsumerListener(){};
+
+    public KafkaConsumerListener() {
+    }
+
+    ;
 
     @KafkaListener(topics = {"chatContent"})
     public void listen(ConsumerRecord<?, ?> record) {
@@ -29,12 +34,12 @@ public class KafkaConsumerListener {
             Optional<?> kafkaMessage = Optional.ofNullable(record.value());
             if (kafkaMessage.isPresent()) {
                 Object message = kafkaMessage.get();
-                ChatContent chatContent = (ChatContent) JsonUtil.fromJson((String)message, ChatContent.class);
+                ChatContent chatContent = (ChatContent) JsonUtil.fromJson((String) message, ChatContent.class);
                 mongoRepo.save(chatContent);
             }
-        }catch (Exception e){
-         LOG.error("faild to save chatContent to mongo : {}",e);
-         e.printStackTrace();
+        } catch (Exception e) {
+            LOG.error("faild to save chatContent to mongo : {}", e);
+            e.printStackTrace();
         }
 
     }
