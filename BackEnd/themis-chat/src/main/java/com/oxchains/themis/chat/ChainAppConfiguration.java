@@ -1,4 +1,5 @@
 package com.oxchains.themis.chat;
+
 import com.oxchains.themis.common.auth.AuthError;
 import com.oxchains.themis.common.auth.JwtAuthenticationProvider;
 import com.oxchains.themis.common.auth.JwtTokenFilter;
@@ -13,8 +14,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
 /**
  * create by huohuo
+ *
  * @author huohuo
  */
 @EnableWebSecurity
@@ -31,9 +34,11 @@ public class ChainAppConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/**/*")
                 .permitAll();
     }
+
     @Override
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
     }
+
     /**
      * allow cross origin requests
      */

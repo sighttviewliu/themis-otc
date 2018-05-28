@@ -24,6 +24,7 @@ import java.util.List;
 
 /**
  * create by huohuo
+ *
  * @author huohuo
  */
 @Service
@@ -37,67 +38,71 @@ public class ChatService {
     @Value("${themis.user.redisInfo.hk}")
     private String userHK;
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
-    public List<ChatContent> getChatHistroy(ChatContent chatContent){
-        try{
-            LOG.info("get chat history senderId ："+chatContent.getSenderId()+" reciverId :"+chatContent.getReceiverId()+" orderId: "+chatContent.getOrderId());
-            String keyIDs = ChatUtil.getIDS(chatContent.getSenderId().toString(),chatContent.getReceiverId().toString());
-            List<ChatContent> list = mongoRepo.findChatContentByChatIdAndOrderId(keyIDs,chatContent.getOrderId());
-            for (ChatContent content:list) {
-                if(content.getSenderId().longValue()==chatContent.getSenderId().longValue())
-                {
+
+    public List<ChatContent> getChatHistroy(ChatContent chatContent) {
+        try {
+            LOG.info("get chat history senderId ：" + chatContent.getSenderId() + " reciverId :" + chatContent.getReceiverId() + " orderId: " + chatContent.getOrderId());
+            String keyIDs = ChatUtil.getIDS(chatContent.getSenderId().toString(), chatContent.getReceiverId().toString());
+            List<ChatContent> list = mongoRepo.findChatContentByChatIdAndOrderId(keyIDs, chatContent.getOrderId());
+            for (ChatContent content : list) {
+                if (content.getSenderId().longValue() == chatContent.getSenderId().longValue()) {
                     content.setSenderName(this.getLoginNameByUserId(chatContent.getSenderId().longValue()));
+                } else {
+                    content.setSenderName(this.getLoginNameByUserId(chatContent.getReceiverId().longValue()));
                 }
-                else{content.setSenderName(this.getLoginNameByUserId(chatContent.getReceiverId().longValue()));}
             }
             return list;
-        }
-        catch (Exception e){
-            LOG.error("faild get chat history : {}",e);
+        } catch (Exception e) {
+            LOG.error("faild get chat history : {}", e);
         }
         return null;
     }
+
     //从用户中心 根据用户id获取用户信息
     //从用户中心 根据用户id获取用户信息
-    @HystrixCommand(fallbackMethod ="getUserByIdError" )
-    public User getUserById(Long userId){
+    @HystrixCommand(fallbackMethod = "getUserByIdError")
+    public User getUserById(Long userId) {
 
         try {
             String userInfo = (String) hashOperations.get(userHK, userId.toString());
-            if(StringUtils.isNotBlank(userInfo)){
-                return JsonUtil.jsonToEntity(userInfo,User.class);
+            if (StringUtils.isNotBlank(userInfo)) {
+                return JsonUtil.jsonToEntity(userInfo, User.class);
             }
-            String str = restTemplate.getForObject(ThemisUserAddress.GET_USER+userId, String.class);
-            if(null != str){
+            String str = restTemplate.getForObject(ThemisUserAddress.GET_USER + userId, String.class);
+            if (null != str) {
                 RestResp restResp = JsonUtil.jsonToEntity(str, RestResp.class);
-                if(null != restResp && restResp.status == 1){
-                    hashOperations.put(userHK,userId.toString(),JsonUtil.toJson(restResp.data));
-                    return JsonUtil.objectToEntity(restResp.data,User.class);
+                if (null != restResp && restResp.status == 1) {
+                    hashOperations.put(userHK, userId.toString(), JsonUtil.toJson(restResp.data));
+                    return JsonUtil.objectToEntity(restResp.data, User.class);
                 }
             }
         } catch (Exception e) {
-            LOG.error("get user by id from themis-user faild : {}",e);
-            throw  e;
+            LOG.error("get user by id from themis-user faild : {}", e);
+            throw e;
         }
         return null;
     }
-    public User getUserByIdError(Long userId){
+
+    public User getUserByIdError(Long userId) {
         return null;
     }
-    private String getLoginNameByUserId(Long userId){
+
+    private String getLoginNameByUserId(Long userId) {
         User userById = this.getUserById(userId);
-        return userById != null?userById.getLoginname():null;
+        return userById != null ? userById.getLoginname() : null;
     }
-    public boolean uploadTxInform(UploadTxIdPojo pojo){
+
+    public boolean uploadTxInform(UploadTxIdPojo pojo) {
         try {
             ChannelHandler channelHandler = ChatUtil.txChannels.get(pojo.getId());
-            if(channelHandler != null){
-                LOG.info("连接存在 :"+pojo.getId());
+            if (channelHandler != null) {
+                LOG.info("连接存在 :" + pojo.getId());
                 String message = JsonUtil.toJson(pojo);
                 channelHandler.getChannel().writeAndFlush(new TextWebSocketFrame(message));
                 return true;
             }
         } catch (Exception e) {
-            LOG.error("upload tx inform faild",e.getMessage());
+            LOG.error("upload tx inform faild", e.getMessage());
         }
         return false;
     }

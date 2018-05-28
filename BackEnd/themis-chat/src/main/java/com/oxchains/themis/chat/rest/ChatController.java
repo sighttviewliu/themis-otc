@@ -12,19 +12,22 @@ import javax.annotation.Resource;
 
 /**
  * create by huohuo
+ *
  * @author huohuo
  */
 @RestController
 public class ChatController {
     @Resource
     private ChatService chatService;
+
     @RequestMapping("/chat/getChatHistroy")
-    public RestResp getChatHistroy(ChatContent chatContent){
-      return RestResp.success(chatService.getChatHistroy(chatContent));
+    public RestResp getChatHistroy(ChatContent chatContent) {
+        return RestResp.success(chatService.getChatHistroy(chatContent));
     }
+
     @RequestMapping("/chat/uploadTxInform")
-    public RestResp uploadTxInform(@RequestBody  UploadTxIdPojo pojo){
-        if(pojo.getId() == null){
+    public RestResp uploadTxInform(@RequestBody UploadTxIdPojo pojo) {
+        if (pojo.getId() == null) {
             return RestResp.fail();
         }
         return RestResp.success(chatService.uploadTxInform(pojo));

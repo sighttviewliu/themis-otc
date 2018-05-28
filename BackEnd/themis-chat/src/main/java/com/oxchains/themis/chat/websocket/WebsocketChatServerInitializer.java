@@ -16,26 +16,29 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * create by huohuo
+ *
  * @author huohuo
  */
 public class WebsocketChatServerInitializer extends
         ChannelInitializer<SocketChannel> {
-	private final Logger LOG = LoggerFactory.getLogger(this.getClass());
-	private KafkaService kafkaService;
-	private MessageService messageService;
-	public WebsocketChatServerInitializer(KafkaService kafkaService,MessageService messageService){
-		this.kafkaService = kafkaService;
-		this.messageService = messageService;
-	}
-	@Override
+    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    private KafkaService kafkaService;
+    private MessageService messageService;
+
+    public WebsocketChatServerInitializer(KafkaService kafkaService, MessageService messageService) {
+        this.kafkaService = kafkaService;
+        this.messageService = messageService;
+    }
+
+    @Override
     public void initChannel(SocketChannel ch) throws Exception {
-		ChannelPipeline pipeline = ch.pipeline();
-		pipeline.addLast(new HttpServerCodec());
-		pipeline.addLast(new HttpObjectAggregator(64*1024));
-		pipeline.addLast(new ChunkedWriteHandler());
-		pipeline.addLast(new HttpRequestHandler("/ws"));
-		pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
-		pipeline.addLast(new TextWebSocketFrameHandler(kafkaService,messageService));
+        ChannelPipeline pipeline = ch.pipeline();
+        pipeline.addLast(new HttpServerCodec());
+        pipeline.addLast(new HttpObjectAggregator(64 * 1024));
+        pipeline.addLast(new ChunkedWriteHandler());
+        pipeline.addLast(new HttpRequestHandler("/ws"));
+        pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
+        pipeline.addLast(new TextWebSocketFrameHandler(kafkaService, messageService));
 
     }
 }

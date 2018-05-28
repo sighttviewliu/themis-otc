@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 
 /**
  * create by huohuo
+ *
  * @author huohuo
  */
 @Service
@@ -21,11 +22,13 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
     private KafkaService kafkaService;
     @Resource
     private MessageService messageService;
-    public StartupListener(){
+
+    public StartupListener() {
 
     }
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        new Thread(new WebSocketServer(kafkaService,port,messageService)).start();
+        new Thread(new WebSocketServer(kafkaService, port, messageService)).start();
     }
 }

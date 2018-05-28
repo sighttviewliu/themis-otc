@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * create by huohuo
+ *
  * @author huohuo
  */
 @Service
@@ -18,12 +19,13 @@ public class KafkaService {
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private KafkaTemplate<String,String> kafkaTemplate;
+    private KafkaTemplate<String, String> kafkaTemplate;
+
     public void send(String message) {
         try {
-            kafkaTemplate.send(topic,message);
-        }catch (Exception e){
-            LOG.error("faild to send message : {}",e);
+            kafkaTemplate.send(topic, message);
+        } catch (Exception e) {
+            LOG.error("faild to send message : {}", e);
         }
     }
 }

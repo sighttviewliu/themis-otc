@@ -44,44 +44,45 @@ public class OrderArbitrateListener {
     @Resource
     private MessageService messageService;
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+
     @Scheduled(cron = "*/4 * * * * ?")
-    public void orderArbitrateMonitor(){
+    public void orderArbitrateMonitor() {
         try {
             List<Orders> ordersList = orderRepo.findByArbitrate(ParamType.ArbitrateStatus.ARBITRATEING.getStatus());
-            for (Orders orders: ordersList) {
+            for (Orders orders : ordersList) {
                 List<OrderArbitrate> arbitrateList = arbitrateRepo.findByOrderId(orders.getId());
                 List<String> buyerList = new ArrayList<>(ShamirUtil.N);
                 List<String> sellerList = new ArrayList<>(ShamirUtil.N);
-                for (OrderArbitrate o:arbitrateList) {
-                    if(o.getBuyerAuth()!=null) {
+                for (OrderArbitrate o : arbitrateList) {
+                    if (o.getBuyerAuth() != null) {
                         buyerList.add(o.getBuyerAuth());
                     }
-                    if(o.getSellerAuth()!=null) {
+                    if (o.getSellerAuth() != null) {
                         sellerList.add(o.getSellerAuth());
                     }
                 }
-                if(sellerList.size()>=ShamirUtil.K || buyerList.size()>=ShamirUtil.K){
+                if (sellerList.size() >= ShamirUtil.K || buyerList.size() >= ShamirUtil.K) {
                     OrderAddresskeys odk = addresskeyRepo.findOrderAddresskeysByOrderId(orders.getId());
 
-                    String auth =buyerList.size()>=ShamirUtil.K?ShamirUtil.getAuth(buyerList.toArray(new String[buyerList.size()]))+","+odk.getBuyerPriAuth():ShamirUtil.getAuth(sellerList.toArray(new String[sellerList.size()]))+","+odk.getSellerPriAuth();
-                    String address = buyerList.size()>=ShamirUtil.K?messageService.getUserById(orders.getBuyerId()).getFirstAddress():messageService.getUserById(orders.getSellerId()).getFirstAddress();
-                    orders.setOrderStatus(buyerList.size()>=ShamirUtil.K?ParamType.OrderStatus.FINISH.getStatus():ParamType.OrderStatus.CANCEL.getStatus());
+                    String auth = buyerList.size() >= ShamirUtil.K ? ShamirUtil.getAuth(buyerList.toArray(new String[buyerList.size()])) + "," + odk.getBuyerPriAuth() : ShamirUtil.getAuth(sellerList.toArray(new String[sellerList.size()])) + "," + odk.getSellerPriAuth();
+                    String address = buyerList.size() >= ShamirUtil.K ? messageService.getUserById(orders.getBuyerId()).getFirstAddress() : messageService.getUserById(orders.getSellerId()).getFirstAddress();
+                    orders.setOrderStatus(buyerList.size() >= ShamirUtil.K ? ParamType.OrderStatus.FINISH.getStatus() : ParamType.OrderStatus.CANCEL.getStatus());
 
-                    OrdersKeyAmount ordersKeyAmount = new OrdersKeyAmount(orders.getId(),auth,orders.getAmount().doubleValue(),address);
-                    HttpEntity<String> formEntity = new HttpEntity<String>(JsonUtil.toJson(ordersKeyAmount),this.getHttpHeader());
-                    JSONObject jsonObject = restTemplate.postForObject(ThemisUserAddress.MOVE_BTC,formEntity,JSONObject.class);
+                    OrdersKeyAmount ordersKeyAmount = new OrdersKeyAmount(orders.getId(), auth, orders.getAmount().doubleValue(), address);
+                    HttpEntity<String> formEntity = new HttpEntity<String>(JsonUtil.toJson(ordersKeyAmount), this.getHttpHeader());
+                    JSONObject jsonObject = restTemplate.postForObject(ThemisUserAddress.MOVE_BTC, formEntity, JSONObject.class);
                     Integer status = (Integer) jsonObject.get("status");
-                    if(status==1){
+                    if (status == 1) {
                         orders.setArbitrate(ParamType.ArbitrateStatus.ARBITRATEEND.getStatus());
                         orders.setFinishTime(DateUtil.getPresentDate());
                         Orders save = orderRepo.save(orders);
                         messageService.postArbitrateFinish(orders);
                         List<OrderArbitrate> arbitrates = arbitrateRepo.findByOrOrderIdAndStatus(orders.getId(), ParamType.ArbitrateStatus.ARBITRATEING.getStatus());
-                        for(OrderArbitrate oa :arbitrates){
+                        for (OrderArbitrate oa : arbitrates) {
                             oa.setStatus(ParamType.ArbitrateStatus.ARBITRATEEND.getStatus());
                             arbitrateRepo.save(oa);
                         }
-                        if(save.getOrderStatus() == ParamType.OrderStatus.FINISH.getStatus().longValue()){
+                        if (save.getOrderStatus() == ParamType.OrderStatus.FINISH.getStatus().longValue()) {
                             arbitrateService.userTxDetailHandle(save);
                         }
                     }
@@ -89,10 +90,11 @@ public class OrderArbitrateListener {
 
             }
         } catch (RestClientException e) {
-            LOG.error("Order Arbitrate Monitor faild :{}",e);
+            LOG.error("Order Arbitrate Monitor faild :{}", e);
         }
     }
-    private HttpHeaders getHttpHeader(){
+
+    private HttpHeaders getHttpHeader() {
         HttpHeaders headers = null;
         try {
             headers = new HttpHeaders();
@@ -100,8 +102,8 @@ public class OrderArbitrateListener {
             headers.setContentType(type);
             headers.add("Accept", MediaType.APPLICATION_JSON.toString());
         } catch (Exception e) {
-            LOG.error("get http header faild : {}",e);
+            LOG.error("get http header faild : {}", e);
         }
-        return  headers;
+        return headers;
     }
 }

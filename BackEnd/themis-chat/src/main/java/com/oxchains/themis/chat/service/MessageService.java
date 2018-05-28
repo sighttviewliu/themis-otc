@@ -22,13 +22,12 @@ public class MessageService {
     @Resource
     private MessageTextRepo messageTextRepo;
 
-    public void postPriChatMessage(ChatContent chatContent){
-        MessageText messageText = new MessageText(chatContent.getSenderId().longValue(),chatContent.getChatContent(), MessageType.PRIVATE_LETTET,null, DateUtil.getPresentDate(),chatContent.getOrderId());
+    public void postPriChatMessage(ChatContent chatContent) {
+        MessageText messageText = new MessageText(chatContent.getSenderId().longValue(), chatContent.getChatContent(), MessageType.PRIVATE_LETTET, null, DateUtil.getPresentDate(), chatContent.getOrderId());
         MessageText save = messageTextRepo.save(messageText);
-        Message message = new Message(chatContent.getReceiverId().longValue(),save.getId(), MessageReadStatus.UN_READ,MessageType.PRIVATE_LETTET);
+        Message message = new Message(chatContent.getReceiverId().longValue(), save.getId(), MessageReadStatus.UN_READ, MessageType.PRIVATE_LETTET);
         Message save1 = messageRepo.save(message);
     }
-
 
 
 }
