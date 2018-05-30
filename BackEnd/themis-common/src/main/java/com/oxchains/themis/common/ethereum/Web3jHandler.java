@@ -2,8 +2,11 @@ package com.oxchains.themis.common.ethereum;
 
 import groovy.util.logging.Slf4j;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
+import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.utils.Convert;
 
@@ -52,4 +55,19 @@ public class Web3jHandler {
        return balance;
     }
 
+    public EthBlock.Block getLatestBlock() throws IOException {
+        return web3j.ethGetBlockByNumber(DefaultBlockParameterName.LATEST, false).send().getBlock();
+    }
+    public EthBlock.Block getBlock(String hash) throws IOException {
+       return web3j.ethGetBlockByHash(hash, false).send().getBlock();
+    }
+    public EthBlock.Block getBlock(BigInteger number) throws IOException {
+        return web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(number), false).send().getBlock();
+    }
+
+    public Transaction getTransaction(String hash) throws IOException {
+        return web3j.ethGetTransactionByHash(hash).send().getTransaction().map(transaction -> {
+            return transaction;
+        }).orElse(null);
+    }
 }

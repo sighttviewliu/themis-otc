@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class InfoController {
     @GetMapping(value = "/welcome")
-    public String welcome(){
+    public String welcome() {
         return "Welcome to blockchain browser";
     }
 }
