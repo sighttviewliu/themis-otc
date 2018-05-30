@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: themis-message
+  labels:
+    app: themis-message
+spec:
+  ports:
+  - port: 9491
+  selector:
+    app: themis-message
+
+
+#--------------------------------------------------------
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: themis-message
+  labels:
+    app: themis-message
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: themis-message
+    spec:
+      containers:
+      - name: themis-message
+        image: 192.168.1.101:5005/oxchains/themis-message:latest
+#        resources:
+#          requests:
+#            cpu: 100m
+#            memory: 100Mi
+        ports:
+        - containerPort: 9491

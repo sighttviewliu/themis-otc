@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: themis-notice
+  labels:
+    app: themis-notice
+spec:
+  ports:
+  - port: 8083
+  selector:
+    app: themis-notice
+
+
+#--------------------------------------------------------
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: themis-notice
+  labels:
+    app: themis-notice
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: themis-notice
+    spec:
+      containers:
+      - name: themis-notice
+        image: 192.168.1.101:5005/oxchains/themis-notice:latest
+#        resources:
+#          requests:
+#            cpu: 100m
+#            memory: 100Mi
+        ports:
+        - containerPort: 8083
