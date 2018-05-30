@@ -16,16 +16,17 @@ import javax.annotation.Resource;
  * @author huohuo
  */
 @RestController
+@RequestMapping("/chat")
 public class ChatController {
     @Resource
     private ChatService chatService;
 
-    @RequestMapping("/chat/getChatHistroy")
+    @RequestMapping("/getChatHistroy")
     public RestResp getChatHistroy(ChatContent chatContent) {
         return RestResp.success(chatService.getChatHistroy(chatContent));
     }
 
-    @RequestMapping("/chat/uploadTxInform")
+    @RequestMapping("/uploadTxInform")
     public RestResp uploadTxInform(@RequestBody UploadTxIdPojo pojo) {
         if (pojo.getId() == null) {
             return RestResp.fail();
