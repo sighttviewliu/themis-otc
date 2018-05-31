@@ -9,10 +9,12 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public class SocketContext {
     private SocketStrategy socketStrategy;
-    public SocketContext(SocketStrategy socketStrategy){
+
+    public SocketContext(SocketStrategy socketStrategy) {
         this.socketStrategy = socketStrategy;
     }
-    public void disposeInfo(SocketPojo socketPojo, ChannelHandlerContext ctx){
-        socketStrategy.disposeInfo(socketPojo,ctx);
+
+    public void disposeInfo(SocketPojo socketPojo, ChannelHandlerContext ctx) {
+        socketStrategy.disposeInfo(socketPojo, ctx);
     }
 }

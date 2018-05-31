@@ -3,8 +3,10 @@ package com.oxchains.themis.chat.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+
 /**
  * create by huohuo
+ *
  * @author huohuo
  */
 @Entity

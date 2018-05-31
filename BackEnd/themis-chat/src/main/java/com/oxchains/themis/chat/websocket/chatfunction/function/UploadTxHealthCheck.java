@@ -17,12 +17,11 @@ public class UploadTxHealthCheck implements InfoStrategy {
     public void disposeInfo(ChatContent chatContent, ChannelHandlerContext ctx) {
         ChannelHandler channelHandler = ChatUtil.txChannels.get(chatContent.getOrderId());
         ChatContent chatContent1 = new ChatContent();
-        if(channelHandler != null){
+        if (channelHandler != null) {
             channelHandler.setLastUseTime(System.currentTimeMillis());
             chatContent1.setStatus("success");
             channelHandler.getChannel().writeAndFlush(new TextWebSocketFrame(JsonUtil.toJson(chatContent1)));
-        }
-        else{
+        } else {
             chatContent1.setStatus("error");
             ctx.channel().writeAndFlush(new TextWebSocketFrame(JsonUtil.toJson(chatContent1)));
         }

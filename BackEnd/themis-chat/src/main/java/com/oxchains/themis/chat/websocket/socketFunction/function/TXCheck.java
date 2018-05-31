@@ -15,11 +15,11 @@ public class TXCheck implements SocketStrategy {
     @Override
     public void disposeInfo(SocketPojo socketPojo, ChannelHandlerContext ctx) {
         Map<String, ChannelHandler> txChannels = ChatUtil.txChannels;
-        if(txChannels.get(socketPojo.getOrderId()) != null){
+        if (txChannels.get(socketPojo.getOrderId()) != null) {
             txChannels.get(socketPojo.getOrderId()).close();
             txChannels.remove(socketPojo.getOrderId());
         }
-        txChannels.put(socketPojo.getOrderId(),new ChannelHandler(ctx.channel(),System.currentTimeMillis()));
+        txChannels.put(socketPojo.getOrderId(), new ChannelHandler(ctx.channel(), System.currentTimeMillis()));
 
     }
 }

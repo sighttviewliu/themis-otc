@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 /**
  * Created by xuqi on 2017/11/6.
+ *
  * @author huohuo
  */
 public interface InfoStrategy {
