@@ -23,6 +23,7 @@ public class Pojo implements Serializable {
     private Integer pageNum;
     private Integer pageSize;
     private MultipartFile[] multipartFile;
+
     public Integer getPageNum() {
         return pageNum;
     }

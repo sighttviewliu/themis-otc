@@ -1,11 +1,12 @@
 package com.oxchains.themis.arbitrate.entity.vo;
+
 import com.oxchains.themis.repo.entity.Notice;
 import com.oxchains.themis.repo.entity.Orders;
 import com.oxchains.themis.repo.entity.Payment;
 import lombok.Data;
 
 @Data
-public class OrdersInfo extends Orders{
+public class OrdersInfo extends Orders {
     private String p2shAddress;  //协商地址
     private String orderStatusName; //订单状态名称
     private Notice notice;  //相关联的公告信息
@@ -16,8 +17,9 @@ public class OrdersInfo extends Orders{
     private String sellerUsername; //卖家名称
     private Orders orders;
     private Integer status;
+
     public OrdersInfo(Orders orders) {
-        if(orders != null){
+        if (orders != null) {
             this.setId(orders.getId());
             this.setMoney(orders.getMoney());
             this.setAmount(orders.getAmount());

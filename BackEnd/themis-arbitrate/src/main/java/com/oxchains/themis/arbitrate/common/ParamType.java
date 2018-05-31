@@ -3,16 +3,19 @@ package com.oxchains.themis.arbitrate.common;
 public interface ParamType {
     enum ArbitrateStatus {
         //仲裁表状态
-        NOARBITRATE(0,"未仲裁"),ARBITRATEING(1,"仲裁中"),ARBITRATEEND(2,"仲裁结束");
+        NOARBITRATE(0, "未仲裁"), ARBITRATEING(1, "仲裁中"), ARBITRATEEND(2, "仲裁结束");
         private Integer status;
         private String description;
+
         ArbitrateStatus(Integer status, String description) {
             this.status = status;
             this.description = description;
         }
+
         public Integer getStatus() {
             return status;
         }
+
         public String getDescription() {
             return description;
         }
@@ -20,7 +23,7 @@ public interface ParamType {
 
     enum NoticeStatus {
         //公告的类型
-        BUY(1L,"购买"),SELL(2L,"出售");
+        BUY(1L, "购买"), SELL(2L, "出售");
         private Long status;
         private String name;
 
@@ -28,16 +31,19 @@ public interface ParamType {
             this.status = status;
             this.name = name;
         }
+
         public Long getStatus() {
             return status;
         }
+
         public String getName() {
             return name;
         }
     }
-    enum  NoticeTxStatus {
+
+    enum NoticeTxStatus {
         //公告的交易状态
-        NOTX(0,"未交易"),TXING(1,"交易中"),TXEND(2,"交易结束");
+        NOTX(0, "未交易"), TXING(1, "交易中"), TXEND(2, "交易结束");
         private int status;
         private String description;
 
@@ -45,13 +51,16 @@ public interface ParamType {
             this.status = status;
             this.description = description;
         }
+
         public int getStatus() {
             return status;
         }
+
         public String getDescription() {
             return description;
         }
     }
+
     enum OrderStatus {
         //订单状态
         WAIT_CONFIRM(1L, "待确认"),
@@ -64,11 +73,13 @@ public interface ParamType {
         WAIT_REFUND(8L, "退款中");
         private Long status;
         private String name;
+
         OrderStatus(Long value, String name) {
             this.status = value;
             this.name = name;
         }
-        public Long getStatus(){
+
+        public Long getStatus() {
             return this.status;
         }
 
@@ -83,9 +94,10 @@ public interface ParamType {
             return "";
         }
     }
+
     enum RoleStatus {
         //角色
-        ADMIN(1L),CUSTOM_SERVICE(2L),ABRITRATEER(3L),USER(4L);
+        ADMIN(1L), CUSTOM_SERVICE(2L), ABRITRATEER(3L), USER(4L);
         private Long status;
 
         RoleStatus(Long status) {
@@ -96,9 +108,10 @@ public interface ParamType {
             return status;
         }
     }
-    enum  VcurrencyStatus {
+
+    enum VcurrencyStatus {
         //支付类型
-        BTC(1L,"BTC");
+        BTC(1L, "BTC");
         private Long id;
         private String vcurrencyName;
 
@@ -106,9 +119,11 @@ public interface ParamType {
             this.id = id;
             this.vcurrencyName = vcurrencyName;
         }
+
         public Long getId() {
             return id;
         }
+
         public String getVcurrencyName() {
             return vcurrencyName;
         }
