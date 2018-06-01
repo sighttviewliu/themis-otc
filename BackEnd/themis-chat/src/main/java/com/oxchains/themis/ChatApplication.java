@@ -16,9 +16,13 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @EnableEurekaClient
 @EnableHystrix
-public class Application {
+public class ChatApplication {
     public static void main(String[] args) {
+<<<<<<< HEAD:BackEnd/themis-chat/src/main/java/com/oxchains/themis/Application.java
         SpringApplication.run(Application.class, args);
+=======
+        SpringApplication.run(ChatApplication.class,args);
+>>>>>>> ca02506b9b12374588cf34069c931058a95e9531:BackEnd/themis-chat/src/main/java/com/oxchains/themis/ChatApplication.java
     }
 
     @Bean

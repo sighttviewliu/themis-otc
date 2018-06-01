@@ -1,4 +1,4 @@
-package com.oxchains;
+package com.oxchains.themis;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,9 +13,9 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @EnableEurekaClient
 @EnableHystrix
-public class Application {
+public class ArbitrateApplication {
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(ArbitrateApplication.class, args);
     }
 
     @Bean
