@@ -11,8 +11,7 @@ import com.oxchains.themis.common.util.JsonUtil;
 import com.oxchains.themis.common.util.RegexUtils;
 import com.oxchains.themis.common.util.VerifyCodeUtils;
 
-import com.oxchains.themis.repo.entity.user.User;
-import com.oxchains.themis.repo.entity.user.UserRelation;
+import com.oxchains.themis.repo.entity.user.*;
 import com.oxchains.themis.user.service.UserService;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -330,4 +329,52 @@ public class UserController {
         return userService.addBitcoinAddress(loginname,firstAddress);
     }
 
+
+    /**
+     * 检查实名认证
+     */
+    @GetMapping(value = "/qic/{userId}")
+    public RestResp checkQIC(@PathVariable Long userId){
+        return userService.checkQIC(userId);
+    }
+
+    /**
+     * 实名认证
+     */
+    @PostMapping(value = "/qic")
+    public RestResp checkQIC(@RequestBody UserQIC userQIC){
+        return userService.userQIC(userQIC);
+    }
+
+    /**
+     * 绑定银行卡
+     */
+    @PostMapping(value = "/bind/bankcard")
+    public RestResp bankcard(@RequestBody UserPaymentVO vo){
+        return userService.userPayment(vo);
+    }
+
+    /**
+     * 绑定支付宝
+     */
+    @PostMapping(value = "/bind/alipay")
+    public RestResp alipay(@RequestBody UserPaymentVO vo){
+        return userService.userPayment(vo);
+    }
+
+    /**
+     * 添加地址
+     */
+    @PostMapping(value = "/vaddress")
+    public RestResp addAddress(@RequestBody UserAddress userAddress){
+        return userService.addAddress(userAddress);
+    }
+
+    /**
+     * 获取地址
+     */
+    @GetMapping(value = "/vaddress/{userId}")
+    public RestResp getAddress(@PathVariable Long userId){
+        return userService.getAddress(userId);
+    }
 }

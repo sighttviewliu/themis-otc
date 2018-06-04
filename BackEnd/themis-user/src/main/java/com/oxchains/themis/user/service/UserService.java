@@ -1,7 +1,10 @@
 package com.oxchains.themis.user.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.oxchains.basicService.files.tfsService.TFSConsumer;
 import com.oxchains.themis.common.auth.JwtService;
+import com.oxchains.themis.common.constant.Const;
 import com.oxchains.themis.common.constant.Status;
 import com.oxchains.themis.common.constant.UserConstants;
 import com.oxchains.themis.common.mail.Email;
@@ -11,15 +14,9 @@ import com.oxchains.themis.common.param.RequestBody;
 import com.oxchains.themis.common.param.VerifyCode;
 import com.oxchains.themis.common.util.*;
 import com.oxchains.themis.repo.dao.order.OrderDao;
-import com.oxchains.themis.repo.dao.user.RoleDao;
-import com.oxchains.themis.repo.dao.user.UserDao;
-import com.oxchains.themis.repo.dao.user.UserRelationDao;
-import com.oxchains.themis.repo.dao.user.UserTxDetailDao;
+import com.oxchains.themis.repo.dao.user.*;
 import com.oxchains.themis.repo.entity.order.Order;
-import com.oxchains.themis.repo.entity.user.Role;
-import com.oxchains.themis.repo.entity.user.User;
-import com.oxchains.themis.repo.entity.user.UserRelation;
-import com.oxchains.themis.repo.entity.user.UserTxDetail;
+import com.oxchains.themis.repo.entity.user.*;
 import com.oxchains.themis.user.domain.UserRelationInfo;
 import com.oxchains.themis.user.domain.UserTrust;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +26,7 @@ import org.springframework.data.domain.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -709,5 +707,172 @@ public class UserService extends BaseService {
         userDao.save(user);
         return RestResp.success("操作成功",firstAddress);
 
+    }
+
+
+    @Resource
+    private UserQICDao userQICDao;
+
+    @Resource
+    private UserPaymentRepo userPaymentRepo;
+
+    public RestResp checkQIC(Long userId){
+        if(null == userId){
+            return RestResp.fail();
+        }
+        try{
+            UserQIC userQIC = userQICDao.findByUserId(userId);
+            if(null != userQIC){
+                return RestResp.success();
+            }
+        }catch (Exception e){
+            log.error("check QIC error", e);
+        }
+        return RestResp.fail();
+    }
+
+    public RestResp userQIC(UserQIC userQIC){
+        if(null == userQIC){
+            return RestResp.fail();
+        }
+        if(null == userQIC.getUserId()){
+            return RestResp.fail();
+        }
+        if(null == userQIC.getIdNo() || !RegexUtils.match(userQIC.getIdNo(),RegexUtils.REGEX_ID_NUMBER)){
+            return RestResp.fail();
+        }
+        if(userQIC.getRealName() == null || !RegexUtils.match(userQIC.getRealName(),RegexUtils.REGEX_REAL_NAME)){
+            return RestResp.fail();
+        }
+        try{
+            UserQIC userQIC1 = userQICDao.findByUserId(userQIC.getUserId());
+            if(null != userQIC1){
+                return RestResp.fail();
+            }
+            String returnMessage = sendQICRequest(userQIC);
+            JSONObject returnJson = JSON.parseObject(returnMessage);
+            if(returnJson.getInteger("code") != 0 || returnJson.getJSONObject("result").getInteger("res") != 1){
+                return RestResp.fail("认证失败，请重新尝试",userQIC);
+            }
+            userQIC.setPhoto(returnJson.getJSONObject("result").getString("photo"));
+            userQIC1 = userQICDao.save(userQIC);
+            return RestResp.success("认证成功", userQIC1);
+        }catch (Exception e){
+            log.error("QIC failure", e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        }
+        return RestResp.fail();
+    }
+
+    public RestResp userPayment(UserPaymentVO vo){
+        if(null == vo || null == vo.getUserId()){
+            return RestResp.fail();
+        }
+        try{
+            UserPayment payment = userPaymentRepo.findByUserId(vo.getUserId());
+            if(null != vo.getBankCard()){
+                if(null == payment){
+                    payment = new UserPayment();
+                }
+                payment.setBankCard(vo.getBankCard());
+            }else if(null != vo.getAliPay()){
+                if(null == payment){
+                    payment = new UserPayment();
+                }
+                payment.setAliPay(vo.getAliPay());
+                MultipartFile file = vo.getFile();
+                String aliPayQr = uploadFile(file, RandomUtil.getRandomNumber(6));
+                if(null == aliPayQr){
+                    return RestResp.fail("二维码上传失败");
+                }
+                payment.setAliPayQr(aliPayQr);
+            } else {
+                return RestResp.fail();
+            }
+            payment = userPaymentRepo.save(payment);
+            if(null == payment){
+                return RestResp.fail();
+            }
+            return RestResp.success(payment);
+        }catch (Exception e){
+
+        }
+        return RestResp.fail();
+    }
+
+    @Resource
+    private UserAddressRepo userAddressRepo;
+
+    public RestResp addAddress(UserAddress userAddress){
+        if(null == userAddress || null == userAddress.getUserId() || null == userAddress.getAddress() || "".equals(userAddress.getAddress().trim())){
+            return RestResp.fail();
+        }
+        try{
+            UserAddress userAddress1 = userAddressRepo.findByUserIdAndAddress(userAddress.getUserId(),userAddress.getAddress());
+            if(null != userAddress1){
+                return RestResp.fail("地址已存在");
+            }
+            userAddress.setCreateTime(System.currentTimeMillis());
+            userAddress = userAddressRepo.save(userAddress);
+            return RestResp.success(userAddress);
+        }catch (Exception e){
+            log.error("", e);
+        }
+        return RestResp.fail();
+    }
+    public RestResp getAddress(Long userId){
+        if(null == userId){
+            return RestResp.fail();
+        }
+        try{
+            List<UserAddress> userAddress = userAddressRepo.findByUserId(userId);
+            AddressVO vo = null;
+            if(null!= userAddress && userAddress.size()>0){
+                vo = new AddressVO(userId, new HashSet<String>(),new HashSet<String>());
+                for(UserAddress uaddr : userAddress){
+                    Integer type = uaddr.getType();
+                    String address = uaddr.getAddress();
+                    if(Const.VCURR.BTC.getType() == type){
+                        vo.getBtcAddress().add(address);
+                    }else if (Const.VCURR.ETH.getType() == type){
+                        vo.getEthAddress().add(address);
+                    }else {
+
+                    }
+
+                }
+                return RestResp.success("", vo);
+            }
+        }catch (Exception e){
+            log.error("", e);
+        }
+        return RestResp.fail();
+    }
+
+    public String uploadFile(MultipartFile file, Long no){
+        String newFileName = null;
+        if(null != file) {
+            String fileName = file.getOriginalFilename();
+            String suffix = fileName.substring(fileName.lastIndexOf("."));
+            newFileName = tfsConsumer.saveTfsFile(file, no);
+        }
+        return null;
+    }
+
+    @Value("${QIC.appcode}")
+    private String appcode;
+
+    private String sendQICRequest(UserQIC userQIC) throws Exception {
+        String host = "https://eidimage.shumaidata.com";
+        String path = "/eid_image/get";
+        Map<String, String> headers = new HashMap<String, String>();
+        headers.put("Authorization", "APPCODE " + appcode);
+        //根据API的要求，定义相对应的Content-Type
+        headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        Map<String, String> querys = new HashMap<String, String>();
+        Map<String, String> bodys = new HashMap<String, String>();
+        bodys.put("idcard", userQIC.getIdNo());
+        bodys.put("name", userQIC.getRealName());
+        return AliBaBaHttpUtils.doPost(host, path, headers, querys, bodys);
     }
 }
