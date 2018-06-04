@@ -15,8 +15,10 @@ import java.math.BigInteger;
  * @desc:
  */
 @Repository
-public interface EthBlockInfoRepo extends CrudRepository<EthBlockInfo,Long> {
+public interface EthBlockInfoRepo extends CrudRepository<EthBlockInfo, Long> {
     EthBlockInfo findByHash(String hash);
+
     EthBlockInfo findByNumber(BigInteger number);
+
     Page<EthBlockInfo> findAll(Pageable pageable);
 }

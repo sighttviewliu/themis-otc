@@ -55,8 +55,10 @@ public class BlockInfoService {
         try{
             if(block.startsWith("0x") && block.length() == 66){
                 blockInfo = blockInfoRepo.findByHash(block);
+                //blockInfo = EthBlockInfo.block2BlockInfo(Web3jHandler.getInstance(ethServerUrl).getBlock(block));
             }else if(RegexUtils.match(block,RegexUtils.REGEX_POSITIVE_INTEGER)){
                 blockInfo = blockInfoRepo.findByNumber(new BigInteger(block));
+                //blockInfo = EthBlockInfo.block2BlockInfo(Web3jHandler.getInstance(ethServerUrl).getBlock(new BigInteger(block)));
             }else {
 
             }
@@ -74,5 +76,26 @@ public class BlockInfoService {
             log.error("查询地址余额失败", e);
             return RestResp.fail();
         }
+    }
+
+    public RestResp search(String block){
+        if(null == block){
+            return RestResp.fail("请正确填写区块查询信息");
+        }
+        try{
+            if(block.startsWith("0x") && block.length() == 66){
+                EthBlockInfo blockInfo = EthBlockInfo.block2BlockInfo(Web3jHandler.getInstance(ethServerUrl).getBlock(block));
+                return RestResp.success(blockInfo);
+            }else if(RegexUtils.match(block,RegexUtils.REGEX_POSITIVE_INTEGER)){
+                EthBlockInfo blockInfo = EthBlockInfo.block2BlockInfo(Web3jHandler.getInstance(ethServerUrl).getBlock(new BigInteger(block)));
+                return RestResp.success(blockInfo);
+            }else if(block.startsWith("0x") && block.length()==42){
+                return getEthBalance(block);
+            }else {
+            }
+        }catch (Exception e){
+            log.error("查询区块信息出错",e);
+        }
+        return RestResp.fail("输入的查询信息有误");
     }
 }

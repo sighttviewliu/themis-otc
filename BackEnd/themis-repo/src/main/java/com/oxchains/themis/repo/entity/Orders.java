@@ -11,15 +11,16 @@ import java.math.BigDecimal;
 
 /**
  * Created by huohuo on 2017/10/23.
+ *
  * @author huohuo
  */
 
 @Entity
 @Table(name = "tbl_biz_orders")
 @Data
-public class Orders implements Serializable{
+public class Orders implements Serializable {
     @Id
-    @Column(name = "id",length = 255)
+    @Column(name = "id", length = 255)
     private String id;         //订单编号
     private BigDecimal money;  //订单金额
     private String createTime;  //下单时间

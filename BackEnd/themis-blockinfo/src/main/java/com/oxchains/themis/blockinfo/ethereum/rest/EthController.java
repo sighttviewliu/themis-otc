@@ -22,17 +22,23 @@ public class EthController {
     @Resource
     private BlockInfoService blockInfoService;
 
-    @GetMapping(value = "/blockinfo/{pageNo}/{pageSize}")
-    public RestResp getBlockInfo(@PathVariable Integer pageNo, @PathVariable Integer pageSize){
-        return blockInfoService.getEthBlockInfo(pageNo,pageSize);
+    @GetMapping(value = "/block/search/{block}")
+    public RestResp search(@PathVariable String block) {
+        return blockInfoService.search(block);
     }
-    @GetMapping(value = "/blockinfo/{block}")
-    public RestResp getBlockInfo(@PathVariable String block){
+
+    @GetMapping(value = "/blockinfo/{pageNo}/{pageSize}")
+    public RestResp getBlockInfo(@PathVariable Integer pageNo, @PathVariable Integer pageSize) {
+        return blockInfoService.getEthBlockInfo(pageNo, pageSize);
+    }
+
+    @GetMapping(value = "/block/{block}")
+    public RestResp getBlockInfo(@PathVariable String block) {
         return blockInfoService.getEthBlockInfo(block);
     }
 
-    @GetMapping(value = "/balance/{address}")
-    public RestResp getBalance(@PathVariable String address){
+    @GetMapping(value = "/address/{address}")
+    public RestResp getBalance(@PathVariable String address) {
         return blockInfoService.getEthBalance(address);
     }
 
