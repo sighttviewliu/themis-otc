@@ -1,6 +1,6 @@
 package com.oxchains.themis.arbitrate.repo;
 
-import com.oxchains.themis.repo.entity.OrderArbitrate;
+import com.oxchains.themis.repo.entity.order.OrderArbitrate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;

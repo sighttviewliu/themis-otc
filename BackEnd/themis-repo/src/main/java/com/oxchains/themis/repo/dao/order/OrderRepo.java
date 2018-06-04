@@ -1,6 +1,6 @@
-package com.oxchains.themis.repo.dao;
+package com.oxchains.themis.repo.dao.order;
 
-import com.oxchains.themis.repo.entity.Orders;
+import com.oxchains.themis.repo.entity.order.Orders;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;

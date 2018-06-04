@@ -1,7 +1,7 @@
 package com.oxchains.themis.arbitrate.entity.vo;
 
 import com.oxchains.themis.repo.entity.Notice;
-import com.oxchains.themis.repo.entity.Orders;
+import com.oxchains.themis.repo.entity.order.Orders;
 import com.oxchains.themis.repo.entity.Payment;
 import lombok.Data;
 

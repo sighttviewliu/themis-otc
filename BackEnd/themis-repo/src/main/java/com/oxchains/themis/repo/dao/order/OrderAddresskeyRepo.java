@@ -1,6 +1,6 @@
-package com.oxchains.themis.repo.dao;
+package com.oxchains.themis.repo.dao.order;
 
-import com.oxchains.themis.repo.entity.OrderAddresskeys;
+import com.oxchains.themis.repo.entity.order.OrderAddresskeys;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
