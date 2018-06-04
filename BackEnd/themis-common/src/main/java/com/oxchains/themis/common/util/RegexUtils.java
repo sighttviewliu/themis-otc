@@ -22,6 +22,14 @@ public class RegexUtils {
     public static final String REGEX_NAME_LEN32 = "^[a-zA-Z][a-zA-Z_0-9]{5,31}$";
     public static final String REGEX_BTC_ADDRESS = "^[a-zA-Z0-9]${25,33}";
     public static final String REGEX_POSITIVE_INTEGER = "^[1-9]\\d*$";
+
+
+
+    //身份证号正则
+    public static final String REGEX_ID_NUMBER = "(^\\d{15}$)|(^\\d{18}$)|(^\\d{17}(\\d|X|x)$)";
+    //中文姓名正则
+    public static final String REGEX_REAL_NAME ="^[\\u4e00-\\u9fa5]+(·[\\u4e00-\\u9fa5]+)*$";
+
     public static boolean match(String str ,String regex){
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(str);

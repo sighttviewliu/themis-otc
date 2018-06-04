@@ -7,7 +7,7 @@ import com.oxchains.themis.arbitrate.common.RegisterRequest;
 import com.oxchains.themis.arbitrate.service.ArbitrateService;
 import com.oxchains.themis.common.model.RestResp;
 import com.oxchains.themis.common.util.JsonUtil;
-import com.oxchains.themis.repo.entity.OrderArbitrate;
+import com.oxchains.themis.repo.entity.order.OrderArbitrate;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

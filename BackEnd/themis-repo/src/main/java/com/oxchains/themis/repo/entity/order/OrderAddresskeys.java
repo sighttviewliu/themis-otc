@@ -1,4 +1,4 @@
-package com.oxchains.themis.repo.entity;
+package com.oxchains.themis.repo.entity.order;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.NotEmpty;

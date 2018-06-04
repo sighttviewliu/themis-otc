@@ -1,4 +1,4 @@
-package com.oxchains.themis.repo.entity;
+package com.oxchains.themis.repo.entity.order;
 
 import lombok.Data;
 
@@ -11,15 +11,16 @@ import java.math.BigDecimal;
 
 /**
  * Created by huohuo on 2017/10/23.
+ *
  * @author huohuo
  */
 
 @Entity
 @Table(name = "tbl_biz_orders")
 @Data
-public class Order implements Serializable{
+public class Orders implements Serializable {
     @Id
-    @Column(name = "id",length = 255)
+    @Column(name = "id", length = 255)
     private String id;         //订单编号
     private BigDecimal money;  //订单金额
     private String createTime;  //下单时间
@@ -33,8 +34,9 @@ public class Order implements Serializable{
     private Long orderStatus; // 订单状态    1  待确认 2 代付款  3 待收货 4  待评价 5 完成 6  已取消 7等待卖家退款 8 仲裁中
     private Long noticeId;
     private int arbitrate;   //是否在仲裁中 默认 0： 不在仲裁中 1： 在仲裁中 2:仲裁结束
+    private String uri;
 
-    public Order(String id, BigDecimal money, String createTime, BigDecimal amount, Long paymentId, Long vcurrencyId, Long currencyId, Long buyerId, Long sellerId, Long orderStatus, Long noticeId, int arbitrate) {
+    public Orders(String id, BigDecimal money, String createTime, BigDecimal amount, Long paymentId, Long vcurrencyId, Long currencyId, Long buyerId, Long sellerId, Long orderStatus, Long noticeId, int arbitrate) {
         this.id = id;
         this.money = money;
         this.createTime = createTime;
@@ -49,7 +51,7 @@ public class Order implements Serializable{
         this.arbitrate = arbitrate;
     }
 
-    public Order() {
+    public Orders() {
     }
 
 
