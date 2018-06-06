@@ -15,233 +15,291 @@ import java.util.List;
 
 @Slf4j
 public class ContractHandler extends AbstractContract{
-    private UserContract userContract;
-    private ExchangeContract exchangeContract;
-    private TokenContract tokenContract;
 
-    public ContractHandler(UserContract userContract) {
-        this.userContract = userContract;
+    private TradeContract tradeContract;
+    private TrusteeContract trusteeContract;
+
+    public ContractHandler(TradeContract tradeContract) {
+        this.tradeContract = tradeContract;
     }
 
-    public ContractHandler(ExchangeContract exchangeContract) {
-        this.exchangeContract = exchangeContract;
+    public ContractHandler(TrusteeContract trusteeContract) {
+        this.trusteeContract = trusteeContract;
     }
 
-    public ContractHandler(TokenContract tokenContract) {
-        this.tokenContract = tokenContract;
+    public ContractHandler(String path, String password, int type){
+        switch (type){
+            case 1:
+                this.tradeContract = new TradeContract(password, path);
+                break;
+            case 2:
+                this.trusteeContract = new TrusteeContract(password, path);
+                break;
+            default:
+                break;
+        }
     }
 
     public ContractHandler() {}
 
     /**
-     * called by official
+     * call by admin
      */
-    public void addUser(String id, BigInteger fame, String publicKey){
-        String hex = userContract.addUser(id, fame, publicKey);
+    public void addTrustee(String id, BigInteger fame, String publicKey){
+        String hex = trusteeContract.addTrustee(id, fame, publicKey);
         String hash = sendRawTransaction(hex);
-        log.info("addUser()--->Hash: {}", hash);
+        log.info("addTrustee()--->Hash: {}", hash);
     }
 
     /**
-     * called by official
+     * call by admin
      */
-    public void updateUser(String id, BigInteger fame, String publicKey){
-        String hex = userContract.updateUser(id, fame, publicKey);
+    public void removeTrustee(String id){
+        String hex = trusteeContract.removeTrustee(id);
         String hash = sendRawTransaction(hex);
-        log.info("updateUser()--->Hash: {}", hash);
+        log.info("removeTrustee()--->Hash: {}", hash);
     }
 
     /**
-     * called by official
+     * call by admin
      */
-    public void removeUser(String id){
-        String hex = userContract.removeUser(id);
+    public void updateTrusteeFame(String id, BigInteger newFame){
+        String hex = trusteeContract.updateTrusteeFame(id, newFame);
         String hash = sendRawTransaction(hex);
-        log.info("removeUser()--->Hash: {}", hash);
+        log.info("updateTrusteeFame()--->Hash: {}", hash);
     }
 
     /**
-     * called by anyone
+     * call by trustee
      */
-    public boolean isThemisUser(String id) throws IOException {
-        return userContract.isThemisUser(id);
-    }
-
-    /**
-     * called by anyone
-     */
-    public boolean isHoster(String id) throws IOException {
-        return userContract.isHoster(id);
-    }
-
-    /**
-     * called by official
-     */
-    public void addHoster(String id, BigInteger fame, BigInteger deposit, String publicKey){
-        String hex = userContract.addHoster(id, fame, deposit, publicKey);
+    public void increaseDeposit(BigInteger amount){
+        String hex = trusteeContract.increaseDeposit(amount);
         String hash = sendRawTransaction(hex);
-        log.info("addHoster()--->Hash: {}", hash);
+        log.info("increaseDeposit()--->Hash: {}", hash);
     }
 
     /**
-     * called by official
+     * call by trustee
      */
-    public void  updateNormalUserToHoster(String id, BigInteger deposit){
-        String hex = userContract.updateNormalUserToHoster(id, deposit);
+    public void decreaseDeposit(BigInteger amount){
+        String hex = trusteeContract.decreaseDeposit(amount);
         String hash = sendRawTransaction(hex);
-        log.info("updateNormalUserToHoster()--->Hash: {}", hash);
+        log.info("decreaseDeposit()--->Hash: {}", hash);
     }
 
     /**
-     * called by official
+     * call by trustee
      */
-    public void  removeHoster(String id){
-        String hex = userContract.removeHoster(id);
+    public void updatePublicKey(String newKey){
+        String hex = trusteeContract.updatePublicKey(newKey);
         String hash = sendRawTransaction(hex);
-        log.info("removeHoster()--->Hash: {}", hash);
+        log.info("updatePublicKey()--->Hash: {}", hash);
     }
 
     /**
-     * called by official
+     * call by
      */
-    public void  updateUserFame(String id, BigInteger fame){
-        String hex = userContract.updateUserFame(id, fame);
+    public String getTrusteeInfo(String who) throws IOException {
+        return trusteeContract.getTrusteeInfo(who);
+    }
+
+    /**
+     * call by contract
+     */
+    public void getTrustees(BigInteger num) throws IOException {
+        String hex = trusteeContract.getTrustees(num);
         String hash = sendRawTransaction(hex);
-        log.info("updateUserFame()--->Hash: {}", hash);
+        log.info("getTrustees()--->Hash: {}", hash);
     }
 
     /**
-     * called by user
+     * call by
      */
-    public void  updateUserDeposit(BigInteger deposit){
-        String hex = userContract.updateUserDeposit(deposit);
-        String hash = sendRawTransaction(hex);
-        log.info("updateUserDeposit()--->Hash: {}", hash);
+    public boolean isTrustee(String who) throws IOException {
+        return trusteeContract.isTrustee(who);
     }
 
     /**
-     * called by anyone
+     * called by admin
      */
-    public void getHosters(BigInteger num) throws IOException {
-        String hex = userContract.getHosters(num);
-        //String hash = sendRawTransaction(hex);
-        log.info("updateUserDeposit()--->Hex: {}", hex);
-    }
-
-    /**
-     * called by buyer
-     */
-    public void createNewTradeOrder(BigInteger orderId, String seller, BigInteger hosterNum){
-        String hex = exchangeContract.createNewTradeOrder(orderId,seller,hosterNum);
+    public void createNewTradeOrder(BigInteger orderId, BigInteger userId,BigInteger userType, BigInteger value){
+        String hex = tradeContract.createNewTradeOrder(orderId, userId,userType, value);
         String hash = sendRawTransaction(hex);
         log.info("createNewTradeOrder()--->Hash: {}", hash);
     }
 
     /**
-     * called by seller
+     * called by admin
      */
-    public void uploadBuyerShardFromSeller(BigInteger orderID, String shard){
-        String hex = exchangeContract.uploadBuyerShardFromSeller(orderID,shard);
+    public void cancelTrade(BigInteger orderId, BigInteger userId){
+        String hex = tradeContract.cancelTrade(orderId, userId);
         String hash = sendRawTransaction(hex);
-        log.info("uploadBuyerShardFromSeller()--->Hash: {}", hash);
+        log.info("cancelTrade()--->Hash: {}", hash);
     }
 
     /**
-     * called by buyer
+     * called by admin
      */
-    public void uploadSellerShardFromBuyer(BigInteger orderID, String shard){
-        String hex = exchangeContract.uploadSellerShardFromBuyer(orderID,shard);
+    public void confirmTradeOrder(BigInteger orderId, BigInteger userId, BigInteger amount){
+        String hex = tradeContract.confirmTradeOrder(orderId, userId, amount);
         String hash = sendRawTransaction(hex);
-        log.info("uploadSellerShardFromBuyer()--->Hash: {}", hash);
+        log.info("confirmTradeOrder()--->Hash: {}", hash);
+    }
+
+    /**
+     * called by admin
+     */
+    public void finishOrder(BigInteger orderId){
+        String hex = tradeContract.finishOrder(orderId);
+        String hash = sendRawTransaction(hex);
+        log.info("finishOrder()--->Hash: {}", hash);
+    }
+
+    /**
+     * called by admin
+     */
+    public void withdrawFee(BigInteger amount){
+        String hex = tradeContract.withdrawFee(amount);
+        String hash = sendRawTransaction(hex);
+        log.info("withdrawFee()--->Hash: {}", hash);
+    }
+
+    /**
+     * called by admin
+     */
+    public void uploadSecret(BigInteger orderId, String secret, BigInteger userId){
+        String hex = tradeContract.uploadSecret(orderId,secret, userId);
+        String hash = sendRawTransaction(hex);
+        log.info("uploadSecret()--->Hash: {}", hash);
     }
 
     /**
      * called by anyone
      */
-    public void getBuyerShardByHosterID(BigInteger orderID, String hosterID) throws IOException {
-        String result = exchangeContract.getBuyerShardByHosterID(orderID,hosterID);
-        log.info("getBuyerShardByHosterID()--->Result: {}", result);
-    }
-
-    /**
-     * called by anyone
-     */
-    public void getSellerShardByHosterID(BigInteger orderID, String hosterID) throws IOException {
-        String result = exchangeContract.getSellerShardByHosterID(orderID,hosterID);
-        log.info("getSellerShardByHosterID()--->Result: {}", result);
-    }
-
-    /**
-     * called by hoster
-     */
-    public void uploadBuyerDecryptedShard(BigInteger orderID, String decryptedShard){
-        String hex = exchangeContract.uploadBuyerDecryptedShard(orderID,decryptedShard);
-        String hash = sendRawTransaction(hex);
-        log.info("uploadBuyerDecryptedShard()--->Hash: {}", hash);
-    }
-
-    /**
-     * called by hoster
-     */
-    public void uploadSellerDecryptedShard(BigInteger orderID, String decryptedShard){
-        String hex = exchangeContract.uploadSellerDecryptedShard(orderID,decryptedShard);
-        String hash = sendRawTransaction(hex);
-        log.info("uploadSellerDecryptedShard()--->Hash: {}", hash);
-    }
-
-    /**
-     * called by winner
-     */
-    public String getBuyerDecryptedShard(String seller,BigInteger order, String hoster) throws IOException {
-        String result = exchangeContract.getBuyerDecryptedShard(seller, order,hoster);
-        log.info("getBuyerDecryptedShard()--->Result: {}", result);
-        return result;
-    }
-
-    /**
-     * called by winner
-     */
-    public String getSellerDecryptedShard(String buyer, BigInteger order, String hoster) throws IOException {
-        String result = exchangeContract.getSellerDecryptedShard(buyer, order,hoster);
-        log.info("getSellerDecryptedShard()--->Result: {}", result);
-        return result;
-    }
-
-    /**
-     * called by user
-     */
-    public boolean isUserHoster(String from, BigInteger orderID) throws IOException {
-        return exchangeContract.isUserHoster(from, orderID);
-        //log.info("getSellerDecryptedShard()--->Result: {}", result);
-    }
-
-    /**
-     * called by anyone
-     */
-    public String getBuyer(BigInteger orderID) throws IOException {
-        String result = exchangeContract.getBuyer(orderID);
-        log.info("getBuyer()--->Result: {}", result);
+    public String getSecret(BigInteger orderId, String trusteeId, BigInteger userId) throws IOException {
+        String result = tradeContract.getSecret(orderId,trusteeId, userId);
+        log.info("getSecret()--->Result: {}", result);
         return result;
     }
 
     /**
      * called by anyone
      */
-    public String getSeller(BigInteger orderID) throws IOException {
-        String result = exchangeContract.getSeller(orderID);
-        log.info("getBuyer()--->Result: {}", result);
+    public Long getOrderBuyer(BigInteger orderId) throws IOException {
+        Long result = tradeContract.getOrderBuyer(orderId);
+        log.info("getOrderBuyer()--->Result: {}", result);
         return result;
     }
+
+
     /**
      * called by anyone
      */
-    public List<String> getShardHosters(BigInteger orderID) throws IOException {
-        return exchangeContract.getShardHosters(orderID);
+    public Long getOrderSeller(BigInteger orderId) throws IOException {
+        Long result = tradeContract.getOrderSeller(orderId);
+        log.info("getOrderSeller()--->Result: {}", result);
+        return result;
     }
 
-    public void approve(String spender, BigInteger value){
-        String hex = tokenContract.approve(spender,value);
-        String hash = sendRawTransaction(hex);
-        log.info("approve()--->Hash: {}", hash);
+    /**
+     * called by
+     */
+    public List<String> getOrderTrustees(BigInteger orderId) throws IOException {
+        List<String> result = tradeContract.getOrderTrustees(orderId);
+        log.info("getOrderTrustees()--->Result: {}", result);
+        return result;
     }
+
+    /**
+     * called by
+     */
+    public boolean isOrderTrustee(BigInteger orderId, String user) throws IOException {
+        boolean result = tradeContract.isOrderTrustee(orderId, user);
+        log.info("isOrderTrustee()--->Result: {}", result);
+        return result;
+    }
+
+    /**
+     * called by
+     */
+    public String addArbitrator(String who){
+        String hex = tradeContract.addArbitrator(who);
+        String hash = sendRawTransaction(hex);
+        log.info("addArbitrator()--->Result: {}", hash);
+        return hash;
+    }
+
+    /**
+     * called by
+     */
+    public String removeArbitrator(String who){
+        String hex = tradeContract.removeArbitrator(who);
+        String hash = sendRawTransaction(hex);
+        log.info("addArbitrator()--->Result: {}", hash);
+        return hash;
+    }
+
+    /**
+     * called by
+     */
+    public boolean isArbitrator(String who) throws IOException {
+        boolean result =tradeContract.isArbitrator(who);
+        log.info("isArbitrator()--->Result: {}", result);
+        return result;
+    }
+
+    /**
+     * called by
+     */
+    public void arbitrate(BigInteger orderId, BigInteger userId){
+        String hex = tradeContract.arbitrate(orderId, userId);
+        String hash = sendRawTransaction(hex);
+        log.info("arbitrate()--->Hash: {}", hash);
+    }
+
+    /**
+     * called by
+     */
+    public void judge(BigInteger orderId, BigInteger winner){
+        String hex = tradeContract.judge(orderId, winner);
+        String hash = sendRawTransaction(hex);
+        log.info("judge()--->Hash: {}", hash);
+    }
+
+    /**
+     * called by
+     */
+    public Long getRequester(BigInteger orderId) throws IOException {
+        Long result = tradeContract.getRequester(orderId);
+        log.info("getRequester()--->Result: {}", result);
+        return result;
+    }
+
+    /**
+     * called by
+     */
+    public Long getWinner(BigInteger orderId) throws IOException {
+        Long result = tradeContract.getWinner(orderId);
+        log.info("getRequester()--->Result: {}", result);
+        return result;
+    }
+
+    /**
+     * called by owner
+     */
+    public void updateDefaultTrusteeNumber(BigInteger hosterNum){
+        String hex = tradeContract.updateDefaultTrusteeNumber(hosterNum);
+        String hash = sendRawTransaction(hex);
+        log.info("updateDefaultTrusteeNumber()--->Hash: {}", hash);
+    }
+
+    /**
+     * called by
+     */
+    public void updateTrusteeContract(String hoster){
+        String hex = tradeContract.updateTrusteeContract(hoster);
+        String hash = sendRawTransaction(hex);
+        log.info("updateTrusteeContract()--->Hash: {}", hash);
+    }
+
 }

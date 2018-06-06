@@ -11,7 +11,10 @@ import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.Transaction;
-import org.web3j.protocol.core.methods.response.*;
+import org.web3j.protocol.core.methods.response.EthCall;
+import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
+import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
+import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.utils.Numeric;
 
@@ -39,8 +42,6 @@ public abstract class AbstractContract{
     protected static final BigInteger GAS_PRICE = new BigInteger("0");
     protected static final BigInteger GAS_LIMIT = new BigInteger("4500000");
     protected static final String SERVER_URL = "http://192.168.1.213:8555";
-    protected static final String WALLET_JSON_FILE = "D:\\temp\\ethereum\\admin.json";
-    protected static final String WALLET_JSON_PASSWD = "123456";
 
     /**
      * 参数说明
@@ -75,9 +76,13 @@ public abstract class AbstractContract{
      * @return
      */
     public String transaction(String to, Function function, Credentials credentials){
+        return transaction(to, function, credentials, BigInteger.ZERO);
+    }
+
+    public String transaction(String to, Function function, Credentials credentials, BigInteger value){
         String encodedFunction = FunctionEncoder.encode(function);
         BigInteger nonce = getNonce(credentials.getAddress());
-        RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, GAS_PRICE, GAS_LIMIT, to/*HOSTER_CONTRACT_ADDRESS*/, BigInteger.ZERO, encodedFunction);
+        RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, GAS_PRICE, GAS_LIMIT, to/*HOSTER_CONTRACT_ADDRESS*/, value, encodedFunction);
         byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
         String hexValue = Numeric.toHexString(signedMessage);
         log.info("signed message hex: {}",hexValue);
@@ -179,6 +184,14 @@ public abstract class AbstractContract{
         if(hex.contains("0x")){
             hex = hex.replace("0x","");
         }
+        return result;
+    }
+
+    public Long hexToLong(String hex){
+        if(hex.contains("0x")){
+            hex = hex.replace("0x","");
+        }
+        Long result = Long.valueOf(hex, 16);
         return result;
     }
     public void Test() throws Exception {
