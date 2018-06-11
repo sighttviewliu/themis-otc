@@ -1,12 +1,11 @@
 package com.oxchains.themis.common.ethereum;
 
-import groovy.util.logging.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthBlock;
-import org.web3j.protocol.core.methods.response.EthGetBalance;
-import org.web3j.protocol.core.methods.response.Transaction;
+import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.utils.Convert;
 
@@ -20,8 +19,8 @@ import java.math.BigInteger;
  * @name Web3jHandler
  * @desc:
  */
-@Slf4j
 public class Web3jHandler {
+    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
     private volatile static Web3jHandler instance;
     private static String SERVER_URL = "http://192.168.1.205:8545";
     private static Web3j web3j = null;
@@ -69,5 +68,43 @@ public class Web3jHandler {
         return web3j.ethGetTransactionByHash(hash).send().getTransaction().map(transaction -> {
             return transaction;
         }).orElse(null);
+    }
+    public String sendRawTransactions(String hash) throws Exception {
+        EthSendTransaction ethSendTransaction = null;
+        String transactionHash = null;
+
+        ethSendTransaction = web3j.ethSendRawTransaction(hash).send();
+        if (ethSendTransaction.hasError()) {
+            LOG.error("Transaction Error: {}", ethSendTransaction.getError().getMessage());
+            throw new Exception(ethSendTransaction.getError().getMessage());
+        } else {
+            transactionHash = ethSendTransaction.getTransactionHash();
+            LOG.info("Transactoin Hash: {}", transactionHash);
+        }
+        return transactionHash;
+    }
+    public String sendRawTransaction(String hash){
+        EthSendTransaction ethSendTransaction = null;
+        String transactionHash = null;
+        try {
+            ethSendTransaction = web3j.ethSendRawTransaction(hash).send();
+            if(ethSendTransaction.hasError()){
+                LOG.error("Transaction Error: {}",ethSendTransaction.getError().getMessage());
+            }else {
+                transactionHash = ethSendTransaction.getTransactionHash();
+                LOG.info("Transactoin Hash: {}", transactionHash);
+            }
+        } catch (IOException e) {
+            LOG.error("Send Raw Transaction Error: {}",e);
+        }
+        return transactionHash;
+    }
+
+    public BigInteger getPendingNonce(String address) throws IOException {
+        EthGetTransactionCount count = web3j.ethGetTransactionCount(address, DefaultBlockParameterName.PENDING).send();
+        return count.getTransactionCount();
+    }
+    public void test(){
+
     }
 }

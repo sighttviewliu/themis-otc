@@ -28,6 +28,7 @@
         <module>themis-config</module>
         <module>themis-zuul</module>
         <module>themis-blockinfo</module>
+        <module>themis-wallet</module>
     </modules>
 
     <properties>
