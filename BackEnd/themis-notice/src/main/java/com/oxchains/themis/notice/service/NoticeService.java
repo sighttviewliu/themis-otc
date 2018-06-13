@@ -298,6 +298,10 @@ public class NoticeService {
             Long noticeType = NoticeConst.NoticeType.SELL.getStatus();
             Integer pageNum = notice.getPageNum();
 
+            if (null == pageNum){
+                pageNum = 1;
+            }
+
             Pageable pageable = new PageRequest(pageNum - 1, 5, new Sort(Sort.Direction.ASC, "createTime"));
 
             // 对所在地，货币类型，支付方式判断，可为null
@@ -373,6 +377,10 @@ public class NoticeService {
             Long payType = notice.getPayType();
             Long noticeType = NoticeConst.NoticeType.BUY.getStatus();
             Integer pageNum = notice.getPageNum();
+
+            if (null == pageNum){
+                pageNum = 1;
+            }
 
             Pageable pageable = new PageRequest(pageNum - 1, 5, new Sort(Sort.Direction.ASC, "createTime"));
 
