@@ -71,9 +71,12 @@ public class ArbitrateService {
     public static final Integer SELLER_SUCCESS = 2;
     private static final String remoteError = "服务器繁忙,请稍后重试!";
 
-    /*
+    /**
      * 根据仲裁者id查找哪些订单可以被自己仲裁的订单列表
-     * */
+     *
+     * @param pojos
+     * @return
+     */
     public RestResp findArbitrareOrderById(Pojo pojos) {
         Pageable pageable = new PageRequest(pojos.getPageNum() - 1, pojos.getPageSize(), new Sort(Sort.Direction.DESC, "id"));
         List<OrdersInfo> ordersInfoList = null;
@@ -97,9 +100,12 @@ public class ArbitrateService {
         return RestRespPage.success(ordersInfoList, orderArbitratePage.getTotalPages());
     }
 
-    /*
+    /**
      * 根据订单编号查询订单的详细信息
-     * */
+     *
+     * @param orderId
+     * @return
+     */
     public OrdersInfo findOrdersDetails(String orderId) {
         Orders o = null;
         OrdersInfo ordersInfo = null;
@@ -116,9 +122,11 @@ public class ArbitrateService {
         return ordersInfo;
     }
 
-    /*
+    /**
      * 这是一个工具类方法  为了给要返回到前台的orders 附上订单状态值
-     * */
+     *
+     * @param o
+     */
     public void setOrderStatusName(OrdersInfo o) {
         if (o != null) {
             if (o.getOrderStatus() != null) {
@@ -128,6 +136,12 @@ public class ArbitrateService {
         }
     }
 
+    /**
+     * 用户上传仲裁证据
+     *
+     * @param pojo
+     * @return
+     */
     public RestResp uploadEvidence(RegisterRequest pojo) {
         OrderEvidence orderEvidence = null;
         try {
@@ -189,9 +203,12 @@ public class ArbitrateService {
         return orderEvidence != null ? RestResp.success() : RestResp.fail();
     }
 
-    /*
+    /**
      * 仲裁者仲裁将密匙碎片给胜利者 并且判断一下是谁胜利了
-     * */
+     *
+     * @param pojo
+     * @return
+     */
     public RestResp arbitrateOrderToUser(Pojo pojo) {
         OrderArbitrate orderArbitrate = null;
         try {
@@ -240,7 +257,12 @@ public class ArbitrateService {
         return RestResp.success();
     }
 
-    //从用户中心 根据用户id获取用户信息
+    /**
+     * 从用户中心 根据用户id获取用户信息
+     *
+     * @param userId
+     * @return
+     */
     @HystrixCommand(fallbackMethod = "getUserByIdError")
     public User getUserById(Long userId) {
         try {
@@ -269,7 +291,12 @@ public class ArbitrateService {
         return null;
     }
 
-    //从公告系统 获取公告
+    /**
+     * 从公告系统 获取公告
+     *
+     * @param id
+     * @return
+     */
     @HystrixCommand(fallbackMethod = "remoteNoticeError")
     public Notice findNoticeById(Long id) {
         Notice notice1 = null;
