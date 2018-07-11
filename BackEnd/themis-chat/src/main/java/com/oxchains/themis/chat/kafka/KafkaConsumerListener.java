@@ -3,6 +3,8 @@ package com.oxchains.themis.chat.kafka;
 import com.oxchains.themis.chat.entity.ChatContent;
 import com.oxchains.themis.chat.repo.MongoRepo;
 import com.oxchains.themis.common.util.JsonUtil;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +28,6 @@ public class KafkaConsumerListener {
     public KafkaConsumerListener() {
     }
 
-    ;
 
     @KafkaListener(topics = {"chatContent"})
     public void listen(ConsumerRecord<?, ?> record) {
@@ -35,6 +36,9 @@ public class KafkaConsumerListener {
             if (kafkaMessage.isPresent()) {
                 Object message = kafkaMessage.get();
                 ChatContent chatContent = (ChatContent) JsonUtil.fromJson((String) message, ChatContent.class);
+
+                LOG.info("chatContent ---> " + ReflectionToStringBuilder.toString(chatContent, ToStringStyle.MULTI_LINE_STYLE));
+
                 mongoRepo.save(chatContent);
             }
         } catch (Exception e) {

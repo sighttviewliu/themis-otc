@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+
 /**
  * create by huohuo
  *
@@ -23,9 +24,12 @@ public class KafkaService {
 
     public void send(String message) {
         try {
+            LOG.info("topic --> {}", topic);
             kafkaTemplate.send(topic, message);
         } catch (Exception e) {
             LOG.error("faild to send message : {}", e);
         }
     }
+
+
 }

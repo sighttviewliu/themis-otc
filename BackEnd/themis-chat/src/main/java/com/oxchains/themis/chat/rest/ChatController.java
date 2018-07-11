@@ -1,12 +1,8 @@
 package com.oxchains.themis.chat.rest;
 
-import com.oxchains.themis.chat.entity.ChatContent;
-import com.oxchains.themis.chat.entity.UploadTxIdPojo;
 import com.oxchains.themis.chat.service.ChatService;
 import com.oxchains.themis.common.model.RestResp;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -21,16 +17,14 @@ public class ChatController {
     @Resource
     private ChatService chatService;
 
-    @RequestMapping("/getChatHistroy")
-    public RestResp getChatHistroy(ChatContent chatContent) {
-        return RestResp.success(chatService.getChatHistroy(chatContent));
+    /**
+     * 获取历史聊天记录
+     *
+     * @return
+     */
+    @GetMapping("/history/{orderId}")
+    public RestResp getChatHistroy(@PathVariable String orderId, Long senderId, Long receiverId) {
+        return RestResp.success(chatService.getChatHistroy(orderId, senderId, receiverId));
     }
 
-    @RequestMapping("/uploadTxInform")
-    public RestResp uploadTxInform(@RequestBody UploadTxIdPojo pojo) {
-        if (pojo.getId() == null) {
-            return RestResp.fail();
-        }
-        return RestResp.success(chatService.uploadTxInform(pojo));
-    }
 }

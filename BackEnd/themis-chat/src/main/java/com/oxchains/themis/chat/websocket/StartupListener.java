@@ -29,6 +29,6 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        new Thread(new WebSocketServer(kafkaService, port, messageService)).start();
+        new Thread(new WebSocketServer(kafkaService, 8090, messageService)).start();
     }
 }

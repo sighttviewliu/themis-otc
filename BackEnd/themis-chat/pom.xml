@@ -2,11 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <parent>
         <artifactId>themis</artifactId>
         <groupId>com.oxchains</groupId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>themis-chat</artifactId>
@@ -15,7 +15,6 @@
         <maven.compiler.plugin.version>3.6.1</maven.compiler.plugin.version>
     </properties>
     <dependencies>
-
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
@@ -30,14 +29,9 @@
             <version>3.9</version>
         </dependency>
         <dependency>
-            <artifactId>themis-repo</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
-            <groupId>com.oxchains</groupId>
-        </dependency>
-        <dependency>
             <groupId>com.oxchains</groupId>
             <artifactId>themis-common</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
@@ -55,30 +49,23 @@
             <artifactId>netty-all</artifactId>
             <version>4.0.32.Final</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/commons-collections/commons-collections -->
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.1</version>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
             <version>1.1.1.RELEASE</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
-        <dependency>
+       <!-- <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>1.4.194</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>-->
         <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons -->
         <dependency>
             <groupId>org.springframework.data</groupId>
@@ -98,6 +85,10 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-messaging</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <finalName>themis-chat</finalName>
@@ -106,6 +97,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.plugin.version}</version>
+
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>

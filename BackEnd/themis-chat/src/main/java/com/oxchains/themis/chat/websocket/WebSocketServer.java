@@ -11,11 +11,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -47,10 +44,10 @@ public class WebSocketServer implements Runnable {
     }
 
     protected ScheduledExecutorService keepAliveScheduler = null;
-    /*
-     * running websocket
-     * */
 
+    /**
+     * running websocket
+     */
     @Override
     public void run() {
         this.keepAliveScheduler = newScheduledThreadPool(5, new CustomThreadFactory("keep-alive-channel", true));

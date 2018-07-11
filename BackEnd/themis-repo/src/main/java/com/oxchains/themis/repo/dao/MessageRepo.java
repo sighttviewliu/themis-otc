@@ -8,9 +8,12 @@ import java.util.List;
 
 /**
  * Created by xuqi on 2017/11/7.
+ *
  * @author huohuo
  */
 @Repository
-public interface MessageRepo extends CrudRepository<Message,Long> {
+public interface MessageRepo extends CrudRepository<Message, Long> {
     List<Message> findByIdAndMessageTextId(Long id, Long textid);
+
+    List<Message> findByReceiverIdAndMessageTypeAndReadStatus(Long receiverId, Integer msgType, Integer readState);
 }

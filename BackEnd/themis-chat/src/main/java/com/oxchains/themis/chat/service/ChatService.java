@@ -2,21 +2,18 @@ package com.oxchains.themis.chat.service;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.oxchains.themis.chat.entity.ChatContent;
-import com.oxchains.themis.chat.entity.UploadTxIdPojo;
+import com.oxchains.themis.chat.entity.User;
 import com.oxchains.themis.chat.repo.MongoRepo;
-import com.oxchains.themis.chat.websocket.ChannelHandler;
+import com.oxchains.themis.chat.websocket.SessionManager;
 import com.oxchains.themis.common.constant.ThemisUserAddress;
 import com.oxchains.themis.common.model.RestResp;
 import com.oxchains.themis.common.util.JsonUtil;
-import com.oxchains.themis.repo.entity.user.User;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.stereotype.Service;
-import com.oxchains.themis.chat.websocket.ChatUtil;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
@@ -39,16 +36,19 @@ public class ChatService {
     private String userHK;
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-    public List<ChatContent> getChatHistroy(ChatContent chatContent) {
+    public List<ChatContent> getChatHistroy(String orderId, Long senderId, Long receiverId) {
         try {
-            LOG.info("get chat history senderId ：" + chatContent.getSenderId() + " reciverId :" + chatContent.getReceiverId() + " orderId: " + chatContent.getOrderId());
-            String keyIDs = ChatUtil.getIDS(chatContent.getSenderId().toString(), chatContent.getReceiverId().toString());
-            List<ChatContent> list = mongoRepo.findChatContentByChatIdAndOrderId(keyIDs, chatContent.getOrderId());
+            LOG.info("get chat history senderId ：" + senderId + " reciverId :" + receiverId + " orderId: " + orderId);
+            String keyIDs = SessionManager.getIDS(senderId.toString(), receiverId.toString());
+            List<ChatContent> list = mongoRepo.findChatContentByChatIdAndOrderId(keyIDs, orderId);
+
+            LOG.info("chat history ---> " + list);
+
             for (ChatContent content : list) {
-                if (content.getSenderId().longValue() == chatContent.getSenderId().longValue()) {
-                    content.setSenderName(this.getLoginNameByUserId(chatContent.getSenderId().longValue()));
+                if (content.getSenderId().longValue() == senderId.longValue()) {
+                    content.setSenderName(this.getLoginNameByUserId(senderId.longValue()));
                 } else {
-                    content.setSenderName(this.getLoginNameByUserId(chatContent.getReceiverId().longValue()));
+                    content.setSenderName(this.getLoginNameByUserId(receiverId.longValue()));
                 }
             }
             return list;
@@ -58,8 +58,12 @@ public class ChatService {
         return null;
     }
 
-    //从用户中心 根据用户id获取用户信息
-    //从用户中心 根据用户id获取用户信息
+    /**
+     * 从用户中心 根据用户id获取用户信息
+     *
+     * @param userId
+     * @return
+     */
     @HystrixCommand(fallbackMethod = "getUserByIdError")
     public User getUserById(Long userId) {
 
@@ -92,18 +96,4 @@ public class ChatService {
         return userById != null ? userById.getLoginname() : null;
     }
 
-    public boolean uploadTxInform(UploadTxIdPojo pojo) {
-        try {
-            ChannelHandler channelHandler = ChatUtil.txChannels.get(pojo.getId());
-            if (channelHandler != null) {
-                LOG.info("连接存在 :" + pojo.getId());
-                String message = JsonUtil.toJson(pojo);
-                channelHandler.getChannel().writeAndFlush(new TextWebSocketFrame(message));
-                return true;
-            }
-        } catch (Exception e) {
-            LOG.error("upload tx inform faild", e.getMessage());
-        }
-        return false;
-    }
 }

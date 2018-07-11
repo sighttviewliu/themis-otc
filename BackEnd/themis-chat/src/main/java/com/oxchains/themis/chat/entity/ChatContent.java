@@ -3,10 +3,8 @@ package com.oxchains.themis.chat.entity;
 import lombok.Data;
 
 import javax.persistence.*;
-
 /**
  * create by huohuo
- *
  * @author huohuo
  */
 @Entity
@@ -14,11 +12,11 @@ import javax.persistence.*;
 public class ChatContent {
     @Id
     private String id;
-    private Integer senderId;
+    private Long senderId;
     private String chatContent;
     private String createTime;
     private String senderName;
-    private Integer receiverId;
+    private Long receiverId;
     private String chatId;
     private Integer msgType;
     private String status;
