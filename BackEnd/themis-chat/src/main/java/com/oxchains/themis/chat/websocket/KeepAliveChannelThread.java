@@ -28,9 +28,11 @@ public class KeepAliveChannelThread implements Runnable {
         try {
             for (Long s : SessionManager.getOnlineUsers()) {
                 if (!SessionManager.getSession(s).isAlive()) {
-                    System.out.println("removeSession --> " + ((User) SessionManager.getSession(s).getAttachment()).getId());
-                    SessionManager.getSession(s).removeAttachment();
+                    Session session = SessionManager.getSession(s);
+                    session.removeAttachment();
                     SessionManager.removeSession(s);
+                    session.close();
+                    System.out.println("removeSession --> " + ((User) SessionManager.getSession(s).getAttachment()).getId());
                 }
             }
         } catch (Exception e) {

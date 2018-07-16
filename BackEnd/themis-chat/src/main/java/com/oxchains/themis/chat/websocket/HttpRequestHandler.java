@@ -4,13 +4,6 @@ import com.oxchains.themis.chat.entity.User;
 import com.oxchains.themis.chat.websocket.scanner.Invoker;
 import com.oxchains.themis.chat.websocket.scanner.InvokerManager;
 import com.oxchains.themis.common.model.RestResp;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * create by huohuo

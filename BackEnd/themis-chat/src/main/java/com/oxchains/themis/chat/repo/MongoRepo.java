@@ -8,9 +8,12 @@ import java.util.List;
 
 /**
  * create by huohuo
+ *
  * @author huohuo
  */
 @Repository
 public interface MongoRepo extends MongoRepository<ChatContent, String> {
-    List<ChatContent> findChatContentByChatIdAndOrderId(String chatId,String orderId);
+    List<ChatContent> findChatContentByChatIdAndOrderId(String chatId, String orderId);
+
+    List<ChatContent> findChatContentsByOrderId(String orderId);
 }

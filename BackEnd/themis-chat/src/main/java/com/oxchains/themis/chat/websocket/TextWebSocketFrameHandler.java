@@ -35,6 +35,7 @@ public class TextWebSocketFrameHandler extends
         this.messageService = messageService;
     }
 
+//    public static ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
@@ -50,6 +51,23 @@ public class TextWebSocketFrameHandler extends
         invoker.invoker(ctx, request.getData());
 
     }
+
+    //    @Override
+//    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+//        if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
+//            ctx.pipeline().remove(HttpRequestHandler.class);
+//            channels.add(ctx.channel());
+//        } else {
+//            super.userEventTriggered(ctx, evt);
+//        }
+//    }
+//
+//    @Override
+//    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+//        Channel incoming = ctx.channel();
+//        channels.add(incoming);
+//    }
+//
 
 
     @Override

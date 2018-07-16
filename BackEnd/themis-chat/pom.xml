@@ -60,12 +60,12 @@
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
-       <!-- <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.194</version>
-            <scope>test</scope>
-        </dependency>-->
+        <!-- <dependency>
+             <groupId>com.h2database</groupId>
+             <artifactId>h2</artifactId>
+             <version>1.4.194</version>
+             <scope>test</scope>
+         </dependency>-->
         <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons -->
         <dependency>
             <groupId>org.springframework.data</groupId>
@@ -97,7 +97,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.plugin.version}</version>
-
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>

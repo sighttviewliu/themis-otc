@@ -69,19 +69,25 @@ public class ChatFunction {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    List<ChatContent> chatContentList = messageService.postUnreadChatMessage(user.getId(), MessageType.PRIVATE_LETTET);
+                    Session userSession = SessionManager.getSession(user.getId());
+                    if (null != userSession) {
+                        do {
+                            try {
+                                Thread.sleep(3000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        } while (!userSession.isConnected());
+                        List<ChatContent> chatContentList = messageService.postUnreadChatMessage(user.getId(), MessageType.PRIVATE_LETTET);
 //                    System.out.println("unread message --> " + chatContentList.toString());
-                    for (ChatContent chatContent : chatContentList) {
-                        Response response = new Response(ModuleId.CHAT, CommandId.PRIVATE_CHAT, chatContent);
-                        if (SessionManager.isOnline(user.getId())) {
-                            SessionManager.getSession(user.getId()).write(new TextWebSocketFrame(JsonUtil.toJson(response)));
+                        for (ChatContent chatContent : chatContentList) {
+                            Response response = new Response(ModuleId.CHAT, CommandId.PRIVATE_CHAT, chatContent);
+                            if (SessionManager.isOnline(user.getId())) {
+                                SessionManager.getSession(user.getId()).write(new TextWebSocketFrame(JsonUtil.toJson(response)));
+                            }
                         }
                     }
+
                 }
             }).start();
 
@@ -121,7 +127,7 @@ public class ChatFunction {
             }
             kafkaService.send(JsonUtil.toJson(chatContent));
         } catch (Exception e) {
-            LOG.error("caht disposeInfo faild : {}", e);
+            LOG.error("chat privateChat faild : {}", e);
         }
     }
 
