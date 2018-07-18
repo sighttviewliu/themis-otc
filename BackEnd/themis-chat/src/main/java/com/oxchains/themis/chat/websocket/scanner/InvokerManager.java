@@ -71,6 +71,7 @@ public class InvokerManager {
         T instance = null;
         try {
             instance = clazz.newInstance();
+            //获取类的所有成员变量
             for (Field field : fields) {
                 Method setMethod = getSetMethod(clazz, field.getName());
                 Class<?> type = field.getType();
@@ -83,7 +84,9 @@ public class InvokerManager {
                 }
                 Constructor<?> constructor = type.getDeclaredConstructor(String.class);
 
-                Object value = constructor.newInstance(data.get(field.getName()));
+                String sp = String.valueOf(data.get(field.getName())).split("\\.")[0];
+
+                Object value = constructor.newInstance(sp);
 
                 setMethod.invoke(instance, value);
             }

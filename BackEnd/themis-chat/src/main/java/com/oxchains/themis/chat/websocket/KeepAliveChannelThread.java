@@ -1,5 +1,7 @@
 package com.oxchains.themis.chat.websocket;
 
+import com.oxchains.themis.chat.entity.HeartBeat;
+import com.oxchains.themis.chat.entity.Request;
 import com.oxchains.themis.chat.entity.User;
 import io.netty.channel.ChannelFuture;
 import org.slf4j.Logger;
@@ -29,10 +31,10 @@ public class KeepAliveChannelThread implements Runnable {
             for (Long s : SessionManager.getOnlineUsers()) {
                 if (!SessionManager.getSession(s).isAlive()) {
                     Session session = SessionManager.getSession(s);
+                    System.out.println("removeSession --> " + ((User) session.getAttachment()).getId());
                     session.removeAttachment();
                     SessionManager.removeSession(s);
                     session.close();
-                    System.out.println("removeSession --> " + ((User) SessionManager.getSession(s).getAttachment()).getId());
                 }
             }
         } catch (Exception e) {

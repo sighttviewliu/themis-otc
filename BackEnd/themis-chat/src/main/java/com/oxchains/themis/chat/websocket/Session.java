@@ -63,4 +63,11 @@ public interface Session {
      * @param time
      */
     void updateLastUseTime(long time);
+
+    /**
+     * 获取上一次使用的时间
+     *
+     * @return
+     */
+    long getLastUseTime();
 }

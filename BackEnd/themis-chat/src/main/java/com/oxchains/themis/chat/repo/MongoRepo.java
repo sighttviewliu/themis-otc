@@ -13,7 +13,11 @@ import java.util.List;
  */
 @Repository
 public interface MongoRepo extends MongoRepository<ChatContent, String> {
+
     List<ChatContent> findChatContentByChatIdAndOrderId(String chatId, String orderId);
 
-    List<ChatContent> findChatContentsByOrderId(String orderId);
+    List<ChatContent> findChatContentByOrderId(String orderId);
+
+    List<ChatContent> findChatContentByChatId(String chatId);
+
 }

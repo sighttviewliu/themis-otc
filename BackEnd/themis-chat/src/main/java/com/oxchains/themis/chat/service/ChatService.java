@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,32 +38,27 @@ public class ChatService {
     private String userHK;
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-    public List<ChatContent> getChatHistroy(String orderId, Long senderId, Long receiverId) {
+    public List<ChatContent> getChatHistroy(Long senderId, Long receiverId) {
         try {
-            LOG.info("get chat history senderId ：" + senderId + " reciverId :" + receiverId + " orderId: " + orderId);
+            LOG.info("get chat history userId ：" + senderId + " orderId: " + receiverId);
             //如果发送者id和接受者id都为空或有一方为空，则通过订单号查询出来
-            if (null == senderId || senderId < 1 || null == receiverId || receiverId < 1) {
-                List<ChatContent> chatContentsByOrderId = mongoRepo.findChatContentsByOrderId(orderId);
-                if (chatContentsByOrderId == null || chatContentsByOrderId.size() < 1) {
-                    return null;
-                }
-                ChatContent chatContent = chatContentsByOrderId.get(0);
-                senderId = chatContent.getSenderId();
-                receiverId = chatContent.getReceiverId();
-            }
+//            if (null == senderId || senderId < 1 || null == receiverId || receiverId < 1) {
+//                List<ChatContent> chatContentsByOrderId = mongoRepo.findChatContentsByOrderId(orderId);
+//                if (chatContentsByOrderId == null || chatContentsByOrderId.size() < 1) {
+//                    return null;
+//                }
+//                ChatContent chatContent = chatContentsByOrderId.get(0);
+//                senderId = chatContent.getSenderId();
+//                receiverId = chatContent.getReceiverId();
+//            }
 
-            String keyIDs = SessionManager.getIDS(senderId.toString(), receiverId.toString());
-            List<ChatContent> list = mongoRepo.findChatContentByChatIdAndOrderId(keyIDs, orderId);
+//            String keyIDs = SessionManager.getIDS(senderId.toString(), receiverId.toString());
+            String chatId = SessionManager.getIDS(senderId + "", receiverId + "");
+
+            List<ChatContent> list = mongoRepo.findChatContentByChatId(chatId);
 
             LOG.info("chat history ---> " + list);
 
-            for (ChatContent content : list) {
-                if (content.getSenderId().longValue() == senderId.longValue()) {
-                    content.setSenderName(this.getLoginNameByUserId(senderId.longValue()));
-                } else {
-                    content.setSenderName(this.getLoginNameByUserId(receiverId.longValue()));
-                }
-            }
             return list;
         } catch (Exception e) {
             LOG.error("faild get chat history : {}", e);
@@ -103,9 +99,27 @@ public class ChatService {
         return null;
     }
 
+    /**
+     * 根据用户的id查询用户的登录名
+     *
+     * @param userId
+     * @return
+     */
     private String getLoginNameByUserId(Long userId) {
         User userById = this.getUserById(userId);
         return userById != null ? userById.getLoginname() : null;
+    }
+
+
+    /**
+     * 根据用户的id查询用户的头像
+     *
+     * @param userId
+     * @return
+     */
+    private String getAvatarByUserId(Long userId) {
+        User userById = this.getUserById(userId);
+        return userById != null ? userById.getAvatar() : null;
     }
 
 
@@ -123,5 +137,4 @@ public class ChatService {
         }
         return false;
     }*/
-
 }

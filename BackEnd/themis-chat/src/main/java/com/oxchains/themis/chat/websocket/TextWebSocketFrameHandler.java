@@ -40,6 +40,8 @@ public class TextWebSocketFrameHandler extends
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
                                 TextWebSocketFrame msg) throws Exception {
+
+        System.out.println("msg text --> " + msg.text());
         Request request = (Request) JsonUtil.fromJson(msg.text(), Request.class);
 
         short module = request.getModule();

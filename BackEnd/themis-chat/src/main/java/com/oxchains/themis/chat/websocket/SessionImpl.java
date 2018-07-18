@@ -75,4 +75,9 @@ public class SessionImpl implements Session {
         this.lastUseTime = time;
     }
 
+    @Override
+    public long getLastUseTime() {
+        return this.lastUseTime;
+    }
+
 }

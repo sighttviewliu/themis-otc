@@ -23,9 +23,9 @@ public class ChatController {
      *
      * @return
      */
-    @GetMapping("/history/{orderId}")
-    public RestResp getChatHistroy(@PathVariable String orderId, Long senderId, Long receiverId) {
-        return RestResp.success(chatService.getChatHistroy(orderId, senderId, receiverId));
+    @GetMapping("/history/{senderId}/{receiverId}")
+    public RestResp getChatHistroy(@PathVariable Long senderId, @PathVariable Long receiverId) {
+        return RestResp.success(chatService.getChatHistroy(senderId, receiverId));
     }
 
 

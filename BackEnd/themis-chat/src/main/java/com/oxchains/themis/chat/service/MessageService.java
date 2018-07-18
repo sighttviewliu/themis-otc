@@ -67,6 +67,4 @@ public class MessageService {
         }
         return chatContentList;
     }
-
-
 }

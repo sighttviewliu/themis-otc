@@ -8,6 +8,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -31,6 +32,8 @@ public class HeartBeatFunction {
         HeartBeat heartBeat = InvokerManager.change(data, HeartBeat.class);
 
         long userId = heartBeat.getUserId();
+
+        System.out.println("id --> " + userId + " 上一次通道使用时间 " + new Date(SessionManager.getSession(userId).getLastUseTime()));
 
         if (SessionManager.isOnline(userId)) {
             SessionManager.getSession(userId).updateLastUseTime(System.currentTimeMillis());
