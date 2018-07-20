@@ -12,14 +12,18 @@ import com.oxchains.themis.common.util.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * create by huohuo
@@ -31,9 +35,12 @@ public class ChatService {
     @Resource
     private MongoRepo mongoRepo;
     @Resource
-    RestTemplate restTemplate;
-    @Resource
-    HashOperations hashOperations;
+    private RestTemplate restTemplate;
+    //    @Resource
+//    private HashOperations hashOperations;
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @Value("${themis.user.redisInfo.hk}")
     private String userHK;
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
@@ -75,8 +82,14 @@ public class ChatService {
     @HystrixCommand(fallbackMethod = "getUserByIdError")
     public User getUserById(Long userId) {
 
+        HashOperations hashOperations = redisTemplate.opsForHash();
+
         try {
             String userInfo = (String) hashOperations.get(userHK, userId.toString());
+            //因为有的值为null，所以要替换一下
+//            userInfo = userInfo.replaceAll("null", "");
+//            System.out.println("userInfo --> " + userInfo + "  " + userInfo.length());
+
             if (StringUtils.isNotBlank(userInfo)) {
                 return JsonUtil.jsonToEntity(userInfo, User.class);
             }
@@ -85,6 +98,8 @@ public class ChatService {
                 RestResp restResp = JsonUtil.jsonToEntity(str, RestResp.class);
                 if (null != restResp && restResp.status == 1) {
                     hashOperations.put(userHK, userId.toString(), JsonUtil.toJson(restResp.data));
+                    Boolean expire = redisTemplate.expire(userHK, 3, TimeUnit.MINUTES);
+                    System.out.println("expire --> " + expire);
                     return JsonUtil.objectToEntity(restResp.data, User.class);
                 }
             }
@@ -137,4 +152,15 @@ public class ChatService {
         }
         return false;
     }*/
+
+
+    /**
+     * 根据userID删除该用户在redis中的用户信息
+     *
+     * @param userId
+     */
+    public void removeUserInfoFromRedis(Long userId) {
+        Long delete = redisTemplate.opsForHash().delete(userHK, userId.toString());
+    }
+
 }

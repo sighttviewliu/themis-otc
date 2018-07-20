@@ -24,7 +24,7 @@ public class KafkaService {
 
     public void send(String message) {
         try {
-            LOG.info("topic --> {}", topic);
+//            LOG.info("topic --> {}", topic);
             kafkaTemplate.send(topic, message);
         } catch (Exception e) {
             LOG.error("faild to send message : {}", e);

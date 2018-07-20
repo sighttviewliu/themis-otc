@@ -1,6 +1,7 @@
 package com.oxchains.themis.chat.websocket;
 
 import com.oxchains.themis.chat.entity.*;
+import com.oxchains.themis.chat.service.ChatService;
 import com.oxchains.themis.chat.service.KafkaService;
 import com.oxchains.themis.chat.service.MessageService;
 import com.oxchains.themis.chat.websocket.scanner.Invoker;
@@ -30,9 +31,12 @@ public class TextWebSocketFrameHandler extends
     private KafkaService kafkaService;
     private MessageService messageService;
 
-    public TextWebSocketFrameHandler(KafkaService kafkaService, MessageService messageService) {
+    private ChatService chatService;
+
+    public TextWebSocketFrameHandler(KafkaService kafkaService, MessageService messageService, ChatService chatService) {
         this.kafkaService = kafkaService;
         this.messageService = messageService;
+        this.chatService = chatService;
     }
 
 //    public static ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
@@ -74,13 +78,14 @@ public class TextWebSocketFrameHandler extends
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-
         SessionImpl session = new SessionImpl(ctx.channel());
         Object attachment = session.getAttachment();
         if (null != attachment) {
             User user = (User) attachment;
+            chatService.removeUserInfoFromRedis(((User) session.getAttachment()).getId());
             session.removeAttachment();
             SessionManager.removeSession(user.getId());
+            session.close();
         }
     }
 
@@ -88,5 +93,6 @@ public class TextWebSocketFrameHandler extends
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         channelInactive(ctx);
     }
+
 
 }

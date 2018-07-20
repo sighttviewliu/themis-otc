@@ -4,6 +4,7 @@ import com.oxchains.themis.chat.entity.*;
 import com.oxchains.themis.chat.service.ChatService;
 import com.oxchains.themis.chat.service.KafkaService;
 import com.oxchains.themis.chat.service.MessageService;
+import com.oxchains.themis.chat.service.SensitiveWordFilter;
 import com.oxchains.themis.chat.websocket.Session;
 import com.oxchains.themis.chat.websocket.SessionImpl;
 import com.oxchains.themis.chat.websocket.SessionManager;
@@ -20,8 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 聊天业务的接口
@@ -42,6 +42,9 @@ public class ChatFunction {
 
     @Autowired
     private ChatService chatService;
+
+    @Autowired
+    private SensitiveWordFilter sensitiveWordFilter;
 
 
     /**
@@ -71,6 +74,10 @@ public class ChatFunction {
             session.setAttachment(user);
 
             System.out.println(user.getId() + " 是否在线 --> " + SessionManager.isOnline(user.getId()));
+
+
+            //删除用户遗留在redis中的用户数据
+            chatService.removeUserInfoFromRedis(user.getId());
 
             //登录后将该用户的未读消息推送到客户端
             new Thread(new Runnable() {
@@ -119,6 +126,16 @@ public class ChatFunction {
 
         ChatContent chatContent = InvokerManager.change(data, ChatContent.class);
 
+        //发送消息的字数限制,字数在1-200之间可以发送，否则消息舍弃
+        int length = chatContent.getChatContent().toCharArray().length;
+        if (length == 0 || length > 200) {
+            return;
+        }
+
+        //敏感词过滤
+        String word = sensitiveWordFilter.replaceSensitiveWord(chatContent.getChatContent(), 1, "*");
+        chatContent.setChatContent(word);
+
 
         try {
             //接收到消息后  先给自己转发一份 在给对方转法一份 如果对方不在线则 发到私信里面 然后将消息存到kafka队列里 由kafka存到mongo里
@@ -161,6 +178,5 @@ public class ChatFunction {
             LOG.error("chat privateChat faild : {}", e);
         }
     }
-
 
 }

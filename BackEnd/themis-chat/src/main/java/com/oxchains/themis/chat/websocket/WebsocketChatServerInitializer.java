@@ -1,5 +1,6 @@
 package com.oxchains.themis.chat.websocket;
 
+import com.oxchains.themis.chat.service.ChatService;
 import com.oxchains.themis.chat.service.KafkaService;
 import com.oxchains.themis.chat.service.MessageService;
 import io.netty.channel.ChannelInitializer;
@@ -24,10 +25,12 @@ public class WebsocketChatServerInitializer extends
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
     private KafkaService kafkaService;
     private MessageService messageService;
+    private ChatService chatService;
 
-    public WebsocketChatServerInitializer(KafkaService kafkaService, MessageService messageService) {
+    public WebsocketChatServerInitializer(KafkaService kafkaService, MessageService messageService, ChatService chatService) {
         this.kafkaService = kafkaService;
         this.messageService = messageService;
+        this.chatService = chatService;
     }
 
     @Override
@@ -38,7 +41,7 @@ public class WebsocketChatServerInitializer extends
         pipeline.addLast(new ChunkedWriteHandler());
         pipeline.addLast(new HttpRequestHandler("/ws"));
         pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
-        pipeline.addLast(new TextWebSocketFrameHandler(kafkaService, messageService));
+        pipeline.addLast(new TextWebSocketFrameHandler(kafkaService, messageService, chatService));
 
     }
 }
