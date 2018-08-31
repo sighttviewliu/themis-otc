@@ -23,11 +23,11 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-ribbon</artifactId>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>3.9</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.oxchains</groupId>
             <artifactId>themis-common</artifactId>

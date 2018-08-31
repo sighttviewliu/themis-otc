@@ -2,6 +2,8 @@ package com.oxchains.themis.user.domain;
 
 import com.oxchains.themis.repo.entity.user.User;
 import com.oxchains.themis.repo.entity.user.UserRelation;
+import com.oxchains.themis.repo.entity.user.UserTxDetail;
+import lombok.Data;
 
 /**
  * @author oxchains
@@ -9,21 +11,13 @@ import com.oxchains.themis.repo.entity.user.UserRelation;
  * @name UserRelationInfo
  * @desc:
  */
+@Data
 public class UserRelationInfo extends User {
     private UserRelation userRelation;
+    private UserTxDetail userTxDetail;
 
     public UserRelationInfo(User user) {
         super(user);
     }
 
-    public UserRelationInfo() {
-    }
-
-    public UserRelation getUserRelation() {
-        return userRelation;
-    }
-
-    public void setUserRelation(UserRelation userRelation) {
-        this.userRelation = userRelation;
-    }
 }

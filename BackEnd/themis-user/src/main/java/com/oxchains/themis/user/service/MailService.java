@@ -7,13 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+//import javax.mail.MessagingException;
+//import javax.mail.internet.MimeMessage;
 import java.io.File;
 
 
@@ -28,14 +27,14 @@ import java.io.File;
 public class MailService {
     //private final Logger log =Logger.getLogger(MailService.class);
 
-    @Resource
+    /*@Resource
     private JavaMailSender mailSender;
 
     @Value("${spring.mail.username}")
-    private String from;
+    private String from;*/
 
     public void send(Email email){
-        SimpleMailMessage message = new SimpleMailMessage();
+        /*SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
         message.setTo(email.getEmail());
         message.setSubject(email.getSubject());
@@ -45,7 +44,7 @@ public class MailService {
             log.info("简单邮件已经发送。");
         } catch (Exception e) {
             log.error("发送简单邮件时发生异常！",e);
-        }
+        }*/
     }
     /**
      * 发送纯文本的简单邮件
@@ -54,7 +53,7 @@ public class MailService {
      * @param content
      */
     public void sendSimpleMail(String to, String subject, String content){
-        SimpleMailMessage message = new SimpleMailMessage();
+        /*SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
         message.setTo(to);
         message.setSubject(subject);
@@ -65,7 +64,7 @@ public class MailService {
             log.info("简单邮件已经发送。");
         } catch (Exception e) {
             log.error("发送简单邮件时发生异常！",e);
-        }
+        }*/
     }
 
     /**
@@ -75,7 +74,7 @@ public class MailService {
      * @param content
      */
     public void sendHtmlMail(String to, String subject, String content){
-        MimeMessage message = mailSender.createMimeMessage();
+        /*MimeMessage message = mailSender.createMimeMessage();
 
         try {
             //true表示需要创建一个multipart message
@@ -89,7 +88,7 @@ public class MailService {
             log.info("html邮件已经发送。");
         } catch (MessagingException e) {
             log.error("发送html邮件时发生异常！", e);
-        }
+        }*/
     }
 
     /**
@@ -100,7 +99,7 @@ public class MailService {
      * @param filePath
      */
     public void sendAttachmentsMail(String to, String subject, String content, String filePath){
-        MimeMessage message = mailSender.createMimeMessage();
+        /*MimeMessage message = mailSender.createMimeMessage();
 
         try {
             //true表示需要创建一个multipart message
@@ -118,7 +117,7 @@ public class MailService {
             log.info("带附件的邮件已经发送。");
         } catch (MessagingException e) {
             log.error("发送带附件的邮件时发生异常！", e);
-        }
+        }*/
     }
 
     /**
@@ -130,7 +129,7 @@ public class MailService {
      * @param rscId 静态资源id
      */
     public void sendInlineResourceMail(String to, String subject, String content, String rscPath, String rscId){
-        MimeMessage message = mailSender.createMimeMessage();
+        /*MimeMessage message = mailSender.createMimeMessage();
 
         try {
             //true表示需要创建一个multipart message
@@ -147,6 +146,6 @@ public class MailService {
             log.info("嵌入静态资源的邮件已经发送。");
         } catch (MessagingException e) {
             log.error("发送嵌入静态资源的邮件时发生异常！", e);
-        }
+        }*/
     }
 }

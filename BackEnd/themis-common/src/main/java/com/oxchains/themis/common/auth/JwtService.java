@@ -110,6 +110,27 @@ public class JwtService {
         return empty();
     }
 
+    /**
+     * 用于保存用户操作日志获取token中的用户信息
+     */
+    public User parseToken(String token){
+        try {
+            Jws<Claims> jws = new DefaultJwtParser()
+                    .setSigningKey(publicKey)
+                    .parseClaimsJws(token);
+            Claims claims = jws.getBody();
+//            String subject=claims.getSubject();
+            Integer id = (Integer) claims.get("id");
+            User user = userDao.findOne(Long.valueOf(id));
+            if (user != null){
+                return user;
+            }
+        }catch (Exception e){
+            LOG.error("parseToken failed", e);
+        }
+        return null;
+    }
+
     private void saveTokenKey(PublicKey pubKey,PrivateKey priKey){
         TokenKey tokenKey = tokenKeyDao.findOne(1L);
         if(null == tokenKey){

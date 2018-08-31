@@ -8,12 +8,17 @@ import com.oxchains.themis.chat.repo.MongoRepo;
 import com.oxchains.themis.chat.websocket.SessionManager;
 import com.oxchains.themis.common.constant.ThemisUserAddress;
 import com.oxchains.themis.common.model.RestResp;
+import com.oxchains.themis.common.util.DateUtil;
 import com.oxchains.themis.common.util.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -21,7 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -45,7 +52,7 @@ public class ChatService {
     private String userHK;
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-    public List<ChatContent> getChatHistroy(Long senderId, Long receiverId) {
+    public List<ChatContent> getChatHistroy(Long senderId, Long receiverId, Integer pageNum) {
         try {
             LOG.info("get chat history userId ：" + senderId + " orderId: " + receiverId);
             //如果发送者id和接受者id都为空或有一方为空，则通过订单号查询出来
@@ -59,18 +66,101 @@ public class ChatService {
 //                receiverId = chatContent.getReceiverId();
 //            }
 
-//            String keyIDs = SessionManager.getIDS(senderId.toString(), receiverId.toString());
-            String chatId = SessionManager.getIDS(senderId + "", receiverId + "");
+            String chatId = SessionManager.getIDS(senderId.toString(), receiverId.toString());
 
-            List<ChatContent> list = mongoRepo.findChatContentByChatId(chatId);
+            List<ChatContent> chatContents = null;
 
-            LOG.info("chat history ---> " + list);
+            //不分页获取聊天记录
+//            chatContents = mongoRepo.findChatContentByChatId(chatId);
 
-            return list;
+//            分页获取聊天记录
+            Pageable pageable = new PageRequest(pageNum - 1, 10, new Sort(Sort.Direction.DESC, "createTime"));
+            Page<ChatContent> list = mongoRepo.findChatContentByChatId(chatId, pageable);
+            chatContents = list.getContent();
+
+//            System.out.println("size --> " + list.getSize() + "  number --> " + list.getNumber() + "  totalPages --> " + list.getTotalPages());
+//            System.out.println(list.getContent());
+
+            //获取最新的用户名称和头像信息
+            for (ChatContent chatContent : chatContents) {
+                chatContent.setUserName(this.getLoginNameByUserId(chatContent.getSenderId()));
+                chatContent.setUserAvatar(this.getAvatarByUserId(chatContent.getSenderId()));
+            }
+
+            LOG.info("chat history ---> " + chatContents);
+
+            return chatContents;
         } catch (Exception e) {
             LOG.error("faild get chat history : {}", e);
         }
         return null;
+    }
+
+    /**
+     * 根据上一条记录的id，查找该记录的后10条记录
+     *
+     * @param previousId
+     * @return
+     */
+    public List<ChatContent> getChatHistoryByPreviousId(Long senderId, Long receiverId, String previousId) {
+        String chatId = SessionManager.getIDS(senderId.toString(), receiverId.toString());
+        String createTime = null;
+        List<ChatContent> chatContents = new ArrayList<>();
+
+        if (StringUtils.isNotBlank(previousId)) {
+            ChatContent one = mongoRepo.findOne(previousId);
+            createTime = null == one ? DateUtil.getPresentDate() : one.getCreateTime();
+            //查找当有时间相同的记录时，去除请求的那个，返回未请求的，防止遗漏记录
+//            chatContents = mongoRepo.findChatContentByChatIdAndCreateTime(chatId, createTime);
+//            for (ChatContent chatContent : chatContents) {
+//                if (previousId.equals(chatContent.getId())) {
+//                    chatContents.remove(chatContent);
+//                    break;
+//                }
+//            }
+//            System.out.println("createTime equal --> " + chatContents.toString());
+        } else {
+            createTime = DateUtil.getPresentDate();
+        }
+
+        //这里的分页是为了截取前10个数据
+        Pageable pageable = new PageRequest(0, 10, new Sort(Sort.Direction.DESC, "createTime"));
+
+        Page<ChatContent> pageInfo = mongoRepo.findChatContentByChatIdAndCreateTimeBefore(chatId, createTime, pageable);
+
+        chatContents.addAll(pageInfo.getContent());
+
+        //获取最新的用户名称和头像信息
+        for (ChatContent chatContent : chatContents) {
+            chatContent.setUserName(this.getLoginNameByUserId(chatContent.getSenderId()));
+            chatContent.setUserAvatar(this.getAvatarByUserId(chatContent.getSenderId()));
+        }
+        System.out.println("chatContents --> " + chatContents.toString());
+
+        return chatContents;
+    }
+
+
+    /**
+     * 获取所有的历史记录
+     *
+     * @param senderId
+     * @param receiverId
+     * @return
+     */
+    public List<ChatContent> getAllChatHistory(Long senderId, Long receiverId) {
+        String chatId = SessionManager.getIDS(senderId.toString(), receiverId.toString());
+
+        List<ChatContent> chatContents = mongoRepo.findChatContentByChatId(chatId);
+
+
+        for (ChatContent chatContent : chatContents) {
+            chatContent.setUserName(this.getLoginNameByUserId(chatContent.getSenderId()));
+            chatContent.setUserAvatar(this.getAvatarByUserId(chatContent.getSenderId()));
+        }
+        System.out.println("chatContents --> " + chatContents.toString());
+
+        return chatContents;
     }
 
     /**
@@ -82,13 +172,10 @@ public class ChatService {
     @HystrixCommand(fallbackMethod = "getUserByIdError")
     public User getUserById(Long userId) {
 
-        HashOperations hashOperations = redisTemplate.opsForHash();
 
         try {
+            HashOperations hashOperations = redisTemplate.opsForHash();
             String userInfo = (String) hashOperations.get(userHK, userId.toString());
-            //因为有的值为null，所以要替换一下
-//            userInfo = userInfo.replaceAll("null", "");
-//            System.out.println("userInfo --> " + userInfo + "  " + userInfo.length());
 
             if (StringUtils.isNotBlank(userInfo)) {
                 return JsonUtil.jsonToEntity(userInfo, User.class);
@@ -96,7 +183,7 @@ public class ChatService {
             String str = restTemplate.getForObject(ThemisUserAddress.GET_USER + userId, String.class);
             if (null != str) {
                 RestResp restResp = JsonUtil.jsonToEntity(str, RestResp.class);
-                if (null != restResp && restResp.status == 1) {
+                if (null != restResp && restResp.status == 1 && null != restResp.data) {
                     hashOperations.put(userHK, userId.toString(), JsonUtil.toJson(restResp.data));
                     Boolean expire = redisTemplate.expire(userHK, 3, TimeUnit.MINUTES);
                     System.out.println("expire --> " + expire);
@@ -105,7 +192,7 @@ public class ChatService {
             }
         } catch (Exception e) {
             LOG.error("get user by id from themis-user faild : {}", e);
-            throw e;
+            e.printStackTrace();
         }
         return null;
     }
@@ -120,7 +207,7 @@ public class ChatService {
      * @param userId
      * @return
      */
-    private String getLoginNameByUserId(Long userId) {
+    public String getLoginNameByUserId(Long userId) {
         User userById = this.getUserById(userId);
         return userById != null ? userById.getLoginname() : null;
     }
@@ -132,7 +219,7 @@ public class ChatService {
      * @param userId
      * @return
      */
-    private String getAvatarByUserId(Long userId) {
+    public String getAvatarByUserId(Long userId) {
         User userById = this.getUserById(userId);
         return userById != null ? userById.getAvatar() : null;
     }

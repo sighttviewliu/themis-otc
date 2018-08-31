@@ -12,4 +12,7 @@ import lombok.Data;
 public class ReqParam {
     private String hash;
     private String address;
+    private Double amount;
+    private String from;
+    private String to;
 }

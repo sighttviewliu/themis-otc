@@ -3,6 +3,8 @@ package com.oxchains.themis.repo.entity.user;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.*;
+
 /**
  * @author ccl
  * @time 2018-05-31 11:36
@@ -10,23 +12,21 @@ import org.springframework.web.multipart.MultipartFile;
  * @desc:
  */
 @Data
-public class UserPaymentVO extends UserPayment {
-    private MultipartFile file;
+public class UserPaymentVO{
+    private Long userId;
+    private String username;
+    private String bankCard;
+    private String bankName;
+    private String aliPay;
+    private String aliPayQr;
 
-    public UserPaymentVO(UserPayment payment){
-        setId(payment.getId());
-        setUserId(payment.getUserId());
-        setBankCard(payment.getBankCard());
-        setAliPay(payment.getAliPay());
-        setAliPayQr(payment.getAliPayQr());
+    private MultipartFile file;
+    private Integer enabled;
+
+    public UserPaymentVO(Long userId) {
+        this.userId = userId;
     }
 
-    public UserPayment userPaymentVO2UserPayment(){
-        UserPayment payment = new UserPayment();
-        payment.setId(this.getId());
-        payment.setUserId(this.getUserId());
-        payment.setAliPay(this.getAliPay());
-        payment.setAliPayQr(this.getAliPayQr());
-        return payment;
+    public UserPaymentVO() {
     }
 }

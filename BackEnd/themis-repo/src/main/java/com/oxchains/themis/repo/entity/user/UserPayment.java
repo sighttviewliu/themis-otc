@@ -18,15 +18,23 @@ public class UserPayment {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(unique = true)
     private Long userId;
 
-    @Column(length = 19)
-    private String bankCard;
+    private Long createTime;
+    //private Long updateTime;
 
     @Column(length = 32)
-    private String aliPay;
-    private String aliPayQr;
+    private String username;
 
+    @Column (length = 32)
+    private String payment;
+    @Column(length = 32)
+    private String paymentName;
 
+    @Column(length = 64)
+    private String paymentQr;
+
+    private Integer ptype;
+
+    private Integer enabled = 1;
 }

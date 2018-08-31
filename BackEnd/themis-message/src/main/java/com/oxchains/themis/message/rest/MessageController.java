@@ -56,7 +56,8 @@ public class MessageController {
      */
     @GetMapping(value = "/query/unReadCount")
     public RestResp unReadCount(@RequestParam Long userId, @RequestParam Integer tip){
-        return messageService.unReadCount(userId, tip);
+//        return messageService.unReadCount(userId, tip);
+        return messageService.queryUnReadCount(userId, tip);
     }
 
 }

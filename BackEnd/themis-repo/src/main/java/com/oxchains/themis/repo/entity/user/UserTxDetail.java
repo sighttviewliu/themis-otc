@@ -21,15 +21,16 @@ public class UserTxDetail {
     private Integer txNum;     //交易次数
     private Integer goodDesc;   //好评次数
     private Integer badDesc;    //差评次数
-    private String firstBuyTime;  //第一次购买时间
+    private Long firstBuyTime;  //第一次购买时间
     private Integer believeNum;    // 信任次数
 
     private Double successCount;
 
-    public UserTxDetail(){}
+    public UserTxDetail() {
+    }
 
-    public UserTxDetail(boolean init){
-        if(init){
+    public UserTxDetail(boolean init) {
+        if (init) {
             this.txNum = 0;
             this.goodDesc = 0;
             this.badDesc = 0;
@@ -37,6 +38,7 @@ public class UserTxDetail {
             this.successCount = 0.0d;
         }
     }
+
     /**
      * 交总量
      */
@@ -46,13 +48,13 @@ public class UserTxDetail {
     @Transient
     private Double sellAmount;
 
-    public void setFirstBuyTime(String firstBuyTime) {
-        if(null == firstBuyTime){
-            this.firstBuyTime = "暂未交易";
+    public void setFirstBuyTime(Long firstBuyTime) {
+        if (null == firstBuyTime) {
+            this.firstBuyTime = 0L;
         }
     }
 
-    public String getFirstBuyTime() {
-        return firstBuyTime==null?"暂未交易":firstBuyTime;
+    public Long getFirstBuyTime() {
+        return firstBuyTime == null ? 0L : firstBuyTime;
     }
 }

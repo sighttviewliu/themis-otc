@@ -85,9 +85,13 @@ public class ChatFunction {
                 public void run() {
                     Session userSession = SessionManager.getSession(user.getId());
                     if (null != userSession) {
+                        int i = 0;
                         do {
                             try {
                                 Thread.sleep(3000);
+                                i++;
+                                if (i == 10)
+                                    return;
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -95,9 +99,8 @@ public class ChatFunction {
                         List<ChatContent> chatContentList = messageService.postUnreadChatMessage(user.getId(), MessageType.PRIVATE_LETTET);
 //                    System.out.println("unread message --> " + chatContentList.toString());
                         for (ChatContent chatContent : chatContentList) {
-                            User sender = chatService.getUserById(chatContent.getSenderId());
-                            chatContent.setUserName(sender.getLoginname());
-                            chatContent.setUserAvatar(sender.getAvatar());
+                            chatContent.setUserName(chatService.getLoginNameByUserId(chatContent.getSenderId()));
+                            chatContent.setUserAvatar(chatService.getAvatarByUserId(chatContent.getSenderId()));
                             Response response = new Response(ModuleId.CHAT, CommandId.PRIVATE_CHAT, chatContent);
                             if (SessionManager.isOnline(user.getId())) {
                                 SessionManager.getSession(user.getId()).write(new TextWebSocketFrame(JsonUtil.toJson(response)));
@@ -151,11 +154,8 @@ public class ChatFunction {
             }
 
             //设置发送者用户的名称和头像
-            User sender = chatService.getUserById(chatContent.getSenderId());
-            if (null != sender) {
-                chatContent.setUserName(sender.getLoginname());
-                chatContent.setUserAvatar(sender.getAvatar());
-            }
+            chatContent.setUserName(chatService.getLoginNameByUserId(chatContent.getSenderId()));
+            chatContent.setUserAvatar(chatService.getAvatarByUserId(chatContent.getSenderId()));
 
             //先给对方转发，可以判断对方是否在线来鉴定此消息是已读还是未读
             //封装发送者用户的名称和头像

@@ -1,6 +1,7 @@
 package com.oxchains.themis;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,7 +17,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  **/
 @EnableWebSecurity
 @Configuration
-public class UserApplicationConfiguration  extends WebSecurityConfigurerAdapter {
+public class UserApplicationConfiguration extends WebSecurityConfigurerAdapter {
 
     //    private final JwtAuthenticationProvider jwtAuthenticationProvider;
 //    private final JwtTokenFilter jwtTokenFilter;
@@ -40,7 +41,6 @@ public class UserApplicationConfiguration  extends WebSecurityConfigurerAdapter 
 //                .accessDeniedHandler(authError);
         http.cors().and().csrf().disable().authorizeRequests().antMatchers("/**/*").permitAll();
     }
-
 
 
     @Override

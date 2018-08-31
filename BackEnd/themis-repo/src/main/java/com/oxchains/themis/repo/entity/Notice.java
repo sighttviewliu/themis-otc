@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author luoxuri
@@ -21,14 +22,16 @@ public class Notice {
     @Column(name = "userid")
     private Long userId;       // user表的id
 
-    private String loginname;   // user表的loginname
+    private String loginname;   // 其实这个loginname是user表的username
 
     @Column(name = "noticetype")
     private Long noticeType;      // 购买BTC/出售BTC
 
     private Long location;        // 所在地
 
-    private Long currency;        // 货币类型
+    private Long coinType;        //交易的数字货币币种选择 1、BTC 2、ETH 3、GET
+
+    private Long currency;        // 货币类型   1、CNY 2、USD 3、JPY 4、KRW 5、HKD
 
     private Double premium = 0D;         // 溢价
 
@@ -44,13 +47,19 @@ public class Notice {
     private BigDecimal maxTxLimit;      // 最大交易限额
 
     @Column(name = "paytype")
-    private Long payType;         // 支付方式/付款方式
+    private String payType;         // 支付方式/付款方式
 
     @Column(name = "noticecontent")
     private String noticeContent;   // 公告内容
 
     @Column(name = "validpaytime")
     private Long validPayTime = 1800000L;      // 付款期限，默认30分钟的毫秒值1800000，字段废弃
+
+    @Column(name = "noticetime")
+    private Long noticeTime =  604800000L;
+
+    @Column(name = "isdelete")
+    private Long isDelete = 0L;                   //公告是否被删除，0存在  1删除  只有下架公告才能被删除
 
     @Transient
     private Long searchType;
@@ -59,7 +68,9 @@ public class Notice {
     private Integer txStatus = 0;           // 交易状态，默认0:非交易和交易进行,2:交易完成
 
     @Column(name = "createtime")
-    private String createTime;
+    private Long createTime;
+
+    private Long exchange;           //交易所  1、average  2、coinmarketcap  3、bitstamp   4、bitfinex
 
     // 以下是暂时展示的数据，实际数据在从对应的表中获取
     @Transient
@@ -75,13 +86,16 @@ public class Notice {
     private Integer goodPercent;
 
     @Transient
-    private Integer pageNum;
-
-    @Transient
     private String searchName;
 
     @Transient
     private String imageName;
+
+    @Transient
+    private double txAmount;
+
+    @Transient
+    private BigDecimal exPrice;       //交易所价格
 
     public Notice(){}
 }

@@ -1,6 +1,7 @@
 package com.oxchains.themis.common.util;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * @author ccl
@@ -27,9 +28,13 @@ public class ArithmeticUtils {
         return b1.add(b2).doubleValue();
     }
 
-    public static double multiPlus(double ... v) {
+    public static BigDecimal plus(BigDecimal v1, BigDecimal v2) {
+        return v1.add(v2);
+    }
+
+    public static double multiPlus(double... v) {
         BigDecimal b = new BigDecimal(0);
-        for(double d : v){
+        for (double d : v) {
             BigDecimal b1 = new BigDecimal(Double.toString(d));
             b = b.add(b1);
         }
@@ -111,6 +116,12 @@ public class ArithmeticUtils {
         return b1.subtract(b2).setScale(scale, BigDecimal.ROUND_HALF_UP).toString();
     }
 
+    public static BigInteger minus(BigInteger v1, BigInteger v2) {
+        if(null == v1 || null == v2){
+            return null;
+        }
+        return v1.subtract(v2);
+    }
     /**
      * 提供精确的乘法运算
      *
@@ -132,6 +143,9 @@ public class ArithmeticUtils {
      * @return 两个参数的积
      */
     public static BigDecimal multiply(String v1, String v2) {
+        if(null == v1 || null == v2){
+            return null;
+        }
         BigDecimal b1 = new BigDecimal(v1);
         BigDecimal b2 = new BigDecimal(v2);
         return b1.multiply(b2);
@@ -297,15 +311,31 @@ public class ArithmeticUtils {
         BigDecimal b2 = new BigDecimal(v2);
         int bj = b1.compareTo(b2);
         boolean res;
-        if (bj > 0){
+        if (bj > 0) {
             res = true;
-        }else {
+        } else {
             res = false;
         }
         return res;
     }
 
+    private static final BigDecimal ETHER = BigDecimal.TEN.pow(18);
+    public static String convertToEther(String val){
+        if(null == val || "".equals(val)){
+            return "0";
+        }
+        BigDecimal b = new BigDecimal(val);
+        if(b.compareTo(new BigDecimal("0")) == 0){
+            return "0";
+        }
+        return b.divide(ETHER).toPlainString();
+    }
+    public static String convertToEther(BigDecimal val){
+        if(null == val){
+            return "";
+        }
+        return val.divide(ETHER).toPlainString();
+    }
     private ArithmeticUtils() {
     }
-
 }

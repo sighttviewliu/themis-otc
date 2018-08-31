@@ -9,7 +9,7 @@ package com.oxchains.themis.common.param;
 public interface ParamType {
 
     enum UpdateUserInfoType implements ParamType {
-        ADD(1),INFO(2),PWD(3),EMAIL(4),PHONE(5),FPWD(6);
+        ADD(1),INFO(2),PWD(3),EMAIL(4),PHONE(5),FPWD(6),NICK_NAME(7);
 
         UpdateUserInfoType(int type){
             this.type=type;

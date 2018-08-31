@@ -1,6 +1,7 @@
 package com.oxchains.themis.repo.dao.user;
 
 import com.oxchains.themis.repo.entity.user.User;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,7 +15,7 @@ import java.util.Optional;
  * @desc:
  */
 @Repository
-public interface UserDao extends CrudRepository<User,Long> {
+public interface UserDao extends CrudRepository<User,Long>, JpaSpecificationExecutor {
     /**
      * find by loginname
      * @param loginname
@@ -58,10 +59,12 @@ public interface UserDao extends CrudRepository<User,Long> {
     Optional<User> findByMobilephoneAndPassword(String loginname, String password);
     Optional<User> findByMobilephoneAndPasswordAndEnabled(String loginname, String password,Integer enabled);
 
-    /**
-     * findByRoleId
-     * @return
-     */
+
     List<User> findByRoleId(Long roleId);
 
+    List<User> findByIdIn(List<Long> ids);
+
+    User findUserById(Long id);
+
+    List<User> findByLoginnameLike(String loginname);
 }

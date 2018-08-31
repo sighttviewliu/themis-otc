@@ -15,5 +15,5 @@ import java.util.List;
 public interface MessageRepo extends CrudRepository<Message, Long> {
     List<Message> findByIdAndMessageTextId(Long id, Long textid);
 
-    List<Message> findByReceiverIdAndMessageTypeAndReadStatus(Long receiverId, Integer msgType, Integer readState);
+    List<Message> findByReceiverIdAndMessageTypeAndReadStatus(Long receiverId, Integer messageType, Integer readStatus);
 }

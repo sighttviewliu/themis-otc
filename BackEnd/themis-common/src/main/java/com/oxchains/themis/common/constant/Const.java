@@ -19,7 +19,7 @@ public interface Const {
 
     String MAIL_TYPE_TEXT = "text/plain";
     String MAIL_TYPE_HTML = "text/html";
-    enum STYPE implements Const {
+    enum STYPE implements Const{
         WEB_LOGNAME(101,"WEB_BROWSER_LOGINNAME"),
         WEB_EMAIL(102,"WEB_BROWSER_EMAIL"),
         WEB_MOBILEPHONE(103,"WEB_BROWSER_MOBILEPHONE"),
@@ -52,7 +52,7 @@ public interface Const {
             this.name = name;
         }
     }
-    enum ROLE implements Const {
+    enum ROLE implements Const{
         /**
          * 管理员
          */
@@ -98,7 +98,7 @@ public interface Const {
         }
     }
 
-     enum APPLYV implements Const {
+     enum APPLYV implements Const{
          /**
           * 申请
           */
@@ -130,7 +130,7 @@ public interface Const {
          }
      }
 
-     enum ENABLE implements Const {
+     enum ENABLE implements Const{
         ENABLEED(1),DISABLED(2);
 
         private int enable;
@@ -148,7 +148,7 @@ public interface Const {
          }
      }
 
-     enum VCURR implements Const {
+     enum VCURR implements Const{
         BTC(1,"BTC"),
          ETH(2,"ETH");
         private int type;
@@ -176,7 +176,7 @@ public interface Const {
          }
      }
 
-     enum CFIELD implements Const {
+     enum CFIELD implements Const{
         LOGIN_NAME(1,"loginname"),EMAIL(2,"email"),MOBILE_PHONE(3,"mobilephone");
         private int fieldValue;
         private String fieldName;
@@ -202,4 +202,154 @@ public interface Const {
              this.fieldName = fieldName;
          }
      }
+    enum ORDER_TYPE {
+        //公告的类型
+        BUY(1,"购买"),SELL(2,"出售");
+        private int type;
+        private String name;
+
+        ORDER_TYPE(int type, String name) {
+            this.type = type;
+            this.name = name;
+        }
+        public int getStatus() {
+            return type;
+        }
+        public String getName() {
+            return name;
+        }
+
+        public static String getName(Integer type) {
+            if (type != null) {
+                for (ORDER_TYPE item : ORDER_TYPE.values()) {
+                    if (item.type == type.intValue()) {
+                        return item.name;
+                    }
+                }
+            }
+            return "";
+        }
+    }
+     enum PAYMENT {
+         CASH(1L, "现金"),
+         BANK_CARD(2L, "银行卡转账"),
+         ALI_PAY(3L, "支付宝"),
+         WECHAT(4L, "微信"),
+         APPLE_PAY(5L, "Apple Pay");
+
+         private long type;
+        private String name;
+
+         PAYMENT(long type, String name) {
+             this.type = type;
+             this.name = name;
+         }
+
+         public long getType() {
+             return type;
+         }
+
+         public void setType(long type) {
+             this.type = type;
+         }
+
+         public String getName() {
+             return name;
+         }
+
+         public void setName(String name) {
+             this.name = name;
+         }
+         public static String getName(Long type) {
+             if (type != null) {
+                 for (PAYMENT item : PAYMENT.values()) {
+                     if (item.type == type.longValue()) {
+                         return item.name;
+                     }
+                 }
+             }
+             return "";
+         }
+     }
+
+    enum DIGICCY {
+        GET(0L, "GET"),
+        BTC(1L, "BTC"),
+        ETH(2L, "ETH"),
+        EOS(3L, "EOS");
+
+        private long type;
+        private String name;
+
+        DIGICCY(long type, String name) {
+            this.type = type;
+            this.name = name;
+        }
+
+        public long getType() {
+            return type;
+        }
+
+        public void setType(long type) {
+            this.type = type;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+        public static String getName(Long type) {
+            if (type != null) {
+                for (DIGICCY item : DIGICCY.values()) {
+                    if (item.type == type.longValue()) {
+                        return item.name;
+                    }
+                }
+            }
+            return "";
+        }
+    }
+
+    enum CURRENCY {
+        CNY(1L, "CNY"),
+        USD(2L, "USD");
+
+        private long type;
+        private String name;
+
+        CURRENCY(long type, String name) {
+            this.type = type;
+            this.name = name;
+        }
+
+        public long getType() {
+            return type;
+        }
+
+        public void setType(long type) {
+            this.type = type;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+        public static String getName(Long type) {
+            if (type != null) {
+                for (CURRENCY item : CURRENCY.values()) {
+                    if (item.type == type.longValue()) {
+                        return item.name;
+                    }
+                }
+            }
+            return "";
+        }
+    }
+
 }

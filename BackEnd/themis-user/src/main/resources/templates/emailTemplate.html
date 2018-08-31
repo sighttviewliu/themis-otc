@@ -1,0 +1,48 @@
+<html>
+<head>
+    <title>通知邮件</title>
+    <meta charset="utf-8"/>
+    <style type="text/css">
+        body {
+            font-size: 10pt;
+        }
+
+        .header, .content, .footer {
+            width: 600px;
+            height: 180px;
+        }
+
+        .footer {
+            text-align: right;
+        }
+
+        #name {
+            color: grey;
+        }
+
+        #message {
+            color: grey;
+        }
+
+    </style>
+
+</head>
+<body>
+<div style="width: 100%">
+    <div class="header" style="background-color:#F3F3F3;text-align: center;margin: 0 auto;">
+        <img style="width:180px;height:180px;"
+             src="https://gss2.bdstatic.com/9fo3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign=eda1fc67a2ec8a13141a50e6cf38f6b2/32fa828ba61ea8d34792ac8c9c0a304e241f5882.jpg"
+             alt="qinghualogo"/>
+    </div>
+    <div class="content" style="margin: 0 auto;">
+        你好，<span id="name"></span>同学:<br/><br/>
+        <div>
+            <span>&#160;&#160;&#160;&#160;&#160;&#160;</span><span id="message"></span>
+        </div>
+        <div class="footer">
+            校园通知(<span id="time"></span>)
+        </div>
+    </div>
+</div>
+</body>
+</html>

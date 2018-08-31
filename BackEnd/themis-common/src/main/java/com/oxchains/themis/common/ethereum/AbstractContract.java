@@ -2,25 +2,27 @@ package com.oxchains.themis.common.ethereum;
 
 import lombok.extern.slf4j.Slf4j;
 import org.web3j.abi.FunctionEncoder;
+import org.web3j.abi.FunctionReturnDecoder;
+import org.web3j.abi.TypeDecoder;
 import org.web3j.abi.TypeReference;
-import org.web3j.abi.datatypes.Address;
-import org.web3j.abi.datatypes.Function;
-import org.web3j.abi.datatypes.Type;
+import org.web3j.abi.datatypes.*;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.Transaction;
-import org.web3j.protocol.core.methods.response.EthCall;
-import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
-import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
-import org.web3j.protocol.core.methods.response.EthSendTransaction;
+import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.Contract;
+import org.web3j.tx.TransactionManager;
+import org.web3j.tx.gas.ContractGasProvider;
+import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -30,7 +32,7 @@ import java.util.concurrent.ExecutionException;
  * @desc:
  */
 @Slf4j
-public abstract class AbstractContract{
+public abstract class AbstractContract {
     protected Credentials credentials;
 
     /**
@@ -39,9 +41,9 @@ public abstract class AbstractContract{
     protected static final String FEE_CONTRACT_ADDRESS = "0xDd27Ae8821fddD0c5dCbCFf3469184FcE0417199";
 
 
-    protected static final BigInteger GAS_PRICE = new BigInteger("0");
+    protected static final BigInteger GAS_PRICE = new BigInteger("18000000000");
     protected static final BigInteger GAS_LIMIT = new BigInteger("4500000");
-    protected static final String SERVER_URL = "http://192.168.1.213:8555";
+    protected static final String SERVER_URL = "http://192.168.1.195:8545";
 
     /**
      * 参数说明
@@ -50,7 +52,6 @@ public abstract class AbstractContract{
      * String publicKey:用户公钥
      * BigInteger userType：用户角色类型（必须为0， 0代表为普通用户，不允许直接将用户添加为托管用户，否则逻辑会有问题）
      * BigInteger deposit：承诺支付的押金，以wei为单位
-     *
      */
 
     protected final Web3j web3j = Web3j.build(new HttpService(SERVER_URL));
@@ -58,7 +59,7 @@ public abstract class AbstractContract{
     public AbstractContract() {
     }
 
-    protected void initCredentials(String password, String source){
+    protected void initCredentials(String password, String source) {
         try {
             credentials = WalletUtils.loadCredentials(password, source);
         } catch (IOException e) {
@@ -70,65 +71,81 @@ public abstract class AbstractContract{
 
     /**
      * trade
-     * @param to Contract Address
-     * @param function input/out parameters
+     *
+     * @param to          Contract Address
+     * @param function    input/out parameters
      * @param credentials call method's user
      * @return
      */
-    public String transaction(String to, Function function, Credentials credentials){
+    public String transaction(String to, Function function, Credentials credentials) {
         return transaction(to, function, credentials, BigInteger.ZERO);
     }
 
-    public String transaction(String to, Function function, Credentials credentials, BigInteger value){
+    public String transaction(String to, Function function, Credentials credentials, BigInteger value) {
         String encodedFunction = FunctionEncoder.encode(function);
-        BigInteger nonce = getNonce(credentials.getAddress());
+        BigInteger nonce = getNonce(credentials.getAddress(), DefaultBlockParameterName.PENDING);
         RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, GAS_PRICE, GAS_LIMIT, to/*HOSTER_CONTRACT_ADDRESS*/, value, encodedFunction);
         byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
         String hexValue = Numeric.toHexString(signedMessage);
-        log.info("signed message hex: {}",hexValue);
+        log.info("signed message hex: {}", hexValue);
         return hexValue;
     }
 
     /**
      * query
+     *
      * @param from
      * @param to
      * @param function input/out parameters
      * @return
      * @throws IOException
      */
-    public String query(String from, String to,Function function) throws IOException {
+    public String query(String from, String to, Function function) throws IOException {
         String encodedFunction = FunctionEncoder.encode(function);
         Transaction ethCallTransaction = Transaction.createEthCallTransaction(from, to, encodedFunction);
         EthCall send = web3j.ethCall(ethCallTransaction, DefaultBlockParameterName.LATEST).send();
         String result = send.getResult();
-        log.info("query result: {}",result.toString());
+        log.info("query result: {}", result.toString());
         return result;
     }
 
     /**
      * get nonce
+     *
      * @param address Contract Address
      * @return
      */
-    public BigInteger getNonce(String address){
+    public BigInteger getNonce(String address) {
+        /*BigInteger nonce = null;
+        try {
+            EthGetTransactionCount count = web3j.ethGetTransactionCount(address, DefaultBlockParameterName.LATEST).send();
+            nonce = count.getTransactionCount();
+            log.info("address: {} ---> nonce: {}", address, nonce);
+        } catch (IOException e) {
+            log.error("Get Address: {} ---> Nonce Error: {}", address, e);
+        }*/
+        return getNonce(address, DefaultBlockParameterName.LATEST);
+    }
+
+    public BigInteger getNonce(String address, DefaultBlockParameterName parameterName) {
         BigInteger nonce = null;
         try {
-            EthGetTransactionCount count = web3j.ethGetTransactionCount(address, DefaultBlockParameterName.PENDING).send();
+            EthGetTransactionCount count = web3j.ethGetTransactionCount(address, parameterName).send();
             nonce = count.getTransactionCount();
-            log.info("address: {} ---> nonce: {}",address, nonce);
+            log.info("address: {} ---> nonce: {}", address, nonce);
         } catch (IOException e) {
-            log.error("Get Address: {} ---> Nonce Error: {}",address, e);
+            log.error("Get Address: {} ---> Nonce Error: {}", address, e);
         }
         return nonce;
     }
 
     /**
      * 后端方法
+     *
      * @param hex
      * @return
      */
-    public String  sendAsyncRawTransaction(String hex){
+    public String sendAsyncRawTransaction(String hex) {
         EthSendTransaction ethSendTransaction = null;
         try {
             ethSendTransaction = web3j.ethSendRawTransaction(hex).sendAsync().get();
@@ -141,64 +158,67 @@ public abstract class AbstractContract{
         return transactionHash;
     }
 
-    public String  sendRawTransaction(String hex){
+    public String sendRawTransaction(String hex) {
         EthSendTransaction ethSendTransaction = null;
         String transactionHash = null;
         try {
             ethSendTransaction = web3j.ethSendRawTransaction(hex).send();
-            if(ethSendTransaction.hasError()){
-                log.error("Transaction Error: {}",ethSendTransaction.getError().getMessage());
-            }else {
+            if (ethSendTransaction.hasError()) {
+                log.error("Transaction Error: {}", ethSendTransaction.getError().getMessage());
+            } else {
                 transactionHash = ethSendTransaction.getTransactionHash();
-                log.info("Transactoin Hash: {}", transactionHash);
+                log.info("Transaction Hash: {}", transactionHash);
             }
         } catch (IOException e) {
-            log.error("Send Raw Transaction Error: {}",e);
+            log.error("Send Raw Transaction Error: {}", e);
         }
         return transactionHash;
     }
 
-    public boolean getTransactionStatus(String hash){
+    public boolean getTransactionStatus(String hash) {
         boolean result = false;
         try {
             EthGetTransactionReceipt receipt = web3j.ethGetTransactionReceipt(hash).send();
             String status = receipt.getTransactionReceipt().get().getStatus();
-            log.info("get transaction: {}---> status: {}",hash, status);
-            result = status.equals("0x1")?true:false;
+            log.info("get transaction: {}---> status: {}", hash, status);
+            result = status.equals("0x1") ? true : false;
         } catch (IOException e) {
-            log.error("get transaction status error: {}",e);
+            log.error("get transaction status error: {}", e);
         }
         return result;
     }
 
-    public boolean hexToBoolean(String hex){
+    public boolean hexToBoolean(String hex) {
         boolean flag = false;
-        if(hex.contains("0x")){
-            hex = hex.replace("0x","");
+        if (hex.contains("0x")) {
+            hex = hex.replace("0x", "");
         }
         flag = new BigInteger(hex, 16).intValue() == 1 ? true : false;
         return flag;
     }
-    public String hexToString(String hex){
+
+    public String hexToString(String hex) {
         String result = null;
-        if(hex.contains("0x")){
-            hex = hex.replace("0x","");
+        if (hex.contains("0x")) {
+            hex = hex.replace("0x", "");
         }
         return result;
     }
 
-    public Long hexToLong(String hex){
-        if(hex.contains("0x")){
-            hex = hex.replace("0x","");
+    public Long hexToLong(String hex) {
+        if (hex.contains("0x")) {
+            hex = hex.replace("0x", "");
         }
         Long result = Long.valueOf(hex, 16);
         return result;
     }
+
     public void Test() throws Exception {
         Web3j web3j = Web3j.build(new HttpService("http://192.168.1.115:8545"));
         Function function = new Function("getFundAddr",
                 Arrays.<Type>asList(new Uint256(1)),
-                Arrays.<TypeReference<?>>asList(new TypeReference<Address>() {}));
+                Arrays.<TypeReference<?>>asList(new TypeReference<Address>() {
+                }));
         String data = FunctionEncoder.encode(function);
         Transaction ethCallTransaction = Transaction.createEthCallTransaction(null, "0x2fb95baf9fdc9b145f9561a097bcfd5c206bad4f", data);
         EthCall send = web3j.ethCall(ethCallTransaction, DefaultBlockParameterName.LATEST).send();

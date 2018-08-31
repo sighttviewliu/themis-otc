@@ -2,12 +2,10 @@ package com.oxchains.themis.blockinfo.ethereum.rest;
 
 import com.oxchains.themis.blockinfo.ethereum.service.BlockInfoService;
 import com.oxchains.themis.common.model.RestResp;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
 
 /**
  * @author ccl
@@ -40,6 +38,44 @@ public class EthController {
     @GetMapping(value = "/address/{address}")
     public RestResp getBalance(@PathVariable String address) {
         return blockInfoService.getEthBalance(address);
+    }
+
+    @GetMapping(value = "/transaction/detail/{txhash}")
+    public RestResp getTransaction(@PathVariable String txhash) {
+        return blockInfoService.getTransaction(txhash);
+    }
+
+    @GetMapping(value = "/transactions/{pageSize}/{pageNo}")
+    public RestResp getTransactionRecord(@PathVariable Integer pageSize, @PathVariable Integer pageNo) {
+        return blockInfoService.getTransactionRecord(pageSize, pageNo);
+    }
+    @GetMapping(value = "/transactions/blockhash/{blockhash}/{pageSize}/{pageNo}")
+    public RestResp getTransactionByBlockHash(@PathVariable String blockhash, @PathVariable Integer pageSize, @PathVariable Integer pageNo) {
+        return blockInfoService.getTransactionByBlock(blockhash, pageSize, pageNo);
+    }
+
+    @GetMapping(value = "/transactions/blocknum/{blocknum}/{pageSize}/{pageNo}")
+    public RestResp getTransactionByBlockNumber(@PathVariable BigInteger blocknum, @PathVariable Integer pageSize, @PathVariable Integer pageNo) {
+        return blockInfoService.getTransactionByBlock(blocknum, pageSize, pageNo);
+    }
+
+    @GetMapping(value = "/transactions/address/{address}/{pageSize}/{pageNo}")
+    public RestResp getTransactionRecord(@PathVariable String address, @PathVariable Integer pageSize, @PathVariable Integer pageNo) {
+        return blockInfoService.getTransactionRecord(address, pageSize, pageNo);
+    }
+
+    @PostMapping(value = "/check/sync/block/{startNum}/{endNum}")
+    public RestResp checkSyncBlock(@PathVariable BigInteger startNum, @PathVariable BigInteger endNum){
+        return blockInfoService.checkSyncBlock(startNum, endNum);
+    }
+    @PostMapping(value = "/check/sync/transaction/{startNum}/{endNum}")
+    public RestResp checkSyncTransaction(@PathVariable BigInteger startNum, @PathVariable BigInteger endNum){
+        return blockInfoService.checkSyncTransaction(startNum, endNum);
+    }
+
+    @PostMapping(value = "/sync/block/{startNum}/{endNum}")
+    public RestResp syncBlock(@PathVariable BigInteger startNum, @PathVariable BigInteger endNum){
+        return blockInfoService.syncBlock(startNum, endNum);
     }
 
 }

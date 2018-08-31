@@ -1,10 +1,12 @@
 package com.oxchains.themis.blockinfo.ethereum.entity;
 
+import com.oxchains.themis.common.ethereum.Web3jHandler;
 import lombok.Data;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
 import javax.persistence.*;
 import java.math.BigInteger;
+import java.security.SignatureException;
 import java.util.List;
 
 /**
@@ -18,12 +20,12 @@ import java.util.List;
 @Table(name = "eth_block_info")
 public class EthBlockInfo{
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
+    @Column(columnDefinition ="bigint")
     private BigInteger number;
+
     private String hash;
     private String parentHash;
+    @Column(columnDefinition ="bigint")
     private BigInteger nonce;
     private String sha3Uncles;
     @Column(length = 1024)
@@ -33,20 +35,21 @@ public class EthBlockInfo{
     private String receiptsRoot;
     private String author;
     private String miner;
+    private String realMiner;
     private String mixHash;
+    @Column(columnDefinition ="bigint")
     private BigInteger difficulty;
+    @Column(columnDefinition ="bigint")
     private BigInteger totalDifficulty;
+    @Column(length = 2048)
     private String extraData;
     private Integer size;
+    @Column(columnDefinition ="bigint")
     private BigInteger gasLimit;
-    private BigInteger gasUsed;
+    private String gasUsed;
     private Long timestamp;
-    @Transient
-    private List<EthBlock.TransactionResult> transactions;
-    @Transient
-    private List<String> uncles;
-    @Transient
-    private List<String> sealFields;
+    private Integer txs;
+    private Integer ucs;
 
     public static EthBlockInfo block2BlockInfo(EthBlock.Block block){
         EthBlockInfo blockInfo = new EthBlockInfo();
@@ -67,9 +70,24 @@ public class EthBlockInfo{
         blockInfo.setExtraData(block.getExtraData());
         blockInfo.setSize(block.getSize()==null?null:block.getSize().intValue());
         blockInfo.setGasLimit(block.getGasLimit());
-        blockInfo.setGasUsed(block.getGasUsed());
+        blockInfo.setGasUsed(block.getGasUsed() == null ? null : block.getGasUsed().toString());
         blockInfo.setTimestamp(block.getTimestamp()==null?null:block.getTimestamp().longValue()*1000);
-
+        blockInfo.setTxs(null == block.getTransactions() ? 0 : block.getTransactions().size());
+        blockInfo.setUcs(null == block.getUncles() ? 0 : block.getUncles().size());
+        if(block.getNumber().longValue() == 0L){
+            blockInfo.setRealMiner(block.getMiner());
+        }else{
+            /**
+             * 解析realminer
+             */
+            String rm = null;
+            try {
+                rm = Web3jHandler.parseAddressFromExtra(block);
+            } catch (SignatureException e) {
+                e.printStackTrace();
+            }
+            blockInfo.setRealMiner(rm);
+        }
         return blockInfo;
     }
 

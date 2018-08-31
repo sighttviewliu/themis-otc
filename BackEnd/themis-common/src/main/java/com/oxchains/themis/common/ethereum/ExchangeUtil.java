@@ -21,7 +21,7 @@ public class ExchangeUtil {
     protected static final String CONTRACT_ADDRESS = "";
     protected static final BigInteger GAS_PRICE = new BigInteger("0");
     protected static final BigInteger GAS_LIMIT = new BigInteger("4500000");
-    protected static final String SERVER_URL = "http://192.168.1.213:8555";
+    protected static final String SERVER_URL = "http://192.168.1.195:8545";
     protected static final String WALLET_JSON_FILE = "D:\\temp\\ethereum\\admin.json";
     protected static final String WALLET_JSON_PASSWD = "123456";
     private String deployContract(Web3j web3j){

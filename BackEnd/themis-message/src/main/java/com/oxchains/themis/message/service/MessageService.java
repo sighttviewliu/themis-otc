@@ -9,10 +9,9 @@ import com.oxchains.themis.message.dao.MessageTextDao;
 import com.oxchains.themis.message.rest.dto.MessageDTO;
 import com.oxchains.themis.message.rest.dto.PageDTO;
 import com.oxchains.themis.message.rest.dto.UnReadSizeDTO;
-import com.oxchains.themis.repo.dao.order.OrderDao;
+import com.oxchains.themis.repo.dao.order.OrderRepo;
 import com.oxchains.themis.repo.dao.user.UserDao;
-import com.oxchains.themis.repo.entity.Message;
-import com.oxchains.themis.repo.entity.MessageText;
+import com.oxchains.themis.repo.entity.*;
 import com.oxchains.themis.repo.entity.order.Order;
 import com.oxchains.themis.repo.entity.user.User;
 import org.slf4j.Logger;
@@ -23,9 +22,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -34,10 +33,9 @@ import java.util.*;
  * @create 2017-11-06 15:02
  **/
 @Service
-@Transactional(rollbackFor=Exception.class)
 public class MessageService {
 
-    private final Logger LOG = LoggerFactory.getLogger(MessageService.class);
+private final Logger LOG = LoggerFactory.getLogger(MessageService.class);
     // 所有未读消息map
     private final Map<Long, Integer> countMap = new HashMap<>();
     // 公告未读消息map
@@ -54,7 +52,7 @@ public class MessageService {
 
     @Resource private MessageDao messageDao;
     @Resource private MessageTextDao messageTextDao;
-    @Resource private OrderDao orderDao;
+    @Resource private OrderRepo orderDao;
     @Resource private UserDao userDao;
 
     @Value("${themis.user.default}") private String userDefaultImage;
@@ -112,43 +110,92 @@ public class MessageService {
      * 查询公告信息
      */
     public RestResp queryNoticeMsg(Long userId, Integer pageNum, Integer pageSize){
+        return queryMessage(userId, pageNum, pageSize, MessageType.PUBLIC, false);
+    }
+
+    public RestResp queryUnReadCount(Long userId, Integer tip){
         try {
-            // 获取自己所在的用户组
-            User user = userDao.findOne(userId);
-            Long userGroup = user.getRoleId();
-
-            Pageable pageable = new PageRequest(pageNum - 1, pageSize, new Sort(Sort.Direction.DESC, "id"));
-            Page<Message> page = messageDao.findByReceiverIdAndMessageType(userId, MessageType.PUBLIC, pageable);
-            Iterator<Message>it = page.iterator();
-            List<MessageDTO> mList = new ArrayList<>();
-            while (it.hasNext()){
-                Message message = it.next();
-                MessageText messageText = messageTextDao.findByIdAndMessageType(message.getMessageTextId(), MessageType.PUBLIC);
-                messageText.setUserGroup(userGroup);
-                messageTextDao.save(messageText);
-                message.setMessageText(messageText);
-                message.setReadStatus(MessageReadStatus.READ);
-                message.setReceiverId(userId);
-                messageDao.save(message);
-
-                mList.add(new MessageDTO(message));
-            }
-            PageDTO<MessageDTO> pageDTO = new PageDTO<>();
-            pageDTO.setPageList(mList);
-            pageDTO.setRowCount(page.getTotalElements());
-            pageDTO.setTotalPage(page.getTotalPages());
-            pageDTO.setPageNum(pageNum);
-            pageDTO.setPageSize(pageSize);
-            return RestResp.success("操作成功", pageDTO);
-        }catch (Exception e){
-            LOG.error("站内信：获取公告信息异常", e);
+            int count = 1;
+            UnReadSizeDTO unReadSizeDTO = invoke(userId, tip, count);
+            return RestResp.success("操作成功", unReadSizeDTO);
+        } catch (Exception e){
+            LOG.error("站内信：获取所以未读信息数量异常", e);
         }
         return RestResp.fail("操作失败");
+    }
+
+    private UnReadSizeDTO invoke(Long userId, Integer tip, int count) throws Exception {
+        // 未读信息添加到message表中
+        addUnReadMsg(userId);
+
+        // 获取个种类未读消息数量
+        Integer unReadNoticeSize = messageDao.countByReceiverIdAndReadStatusAndMessageType(userId, MessageReadStatus.UN_READ, MessageType.PUBLIC);
+        Integer unReadGolbalSize = messageDao.countByReceiverIdAndReadStatusAndMessageType(userId, MessageReadStatus.UN_READ, MessageType.GLOBAL);
+        Integer unReadPrivateSize = messageDao.countByReceiverIdAndReadStatusAndMessageType(userId, MessageReadStatus.UN_READ, MessageType.PRIVATE_LETTET);
+        if (unReadNoticeSize == null){ unReadNoticeSize = 0; }
+        if (unReadGolbalSize == null){ unReadGolbalSize = 0; }
+        if (unReadPrivateSize == null){ unReadPrivateSize = 0; }
+        Integer unReadAll = unReadNoticeSize + unReadGolbalSize + unReadPrivateSize;
+
+        int cacheNoticeCount = countNoticeMap.getOrDefault(userId, 0);
+        int cacheGolbalCount = countGlobalMap.getOrDefault(userId, 0);
+        int cachePrivateCount = countPrivateMap.getOrDefault(userId, 0);
+
+        // 第一次请求获取未读消息
+        if (tip == 1){
+            putMapAndSetValues(userId, unReadNoticeSize, unReadGolbalSize, unReadPrivateSize, unReadAll);
+            return unReadSizeDTO;
+        }
+
+        while (unReadNoticeSize.equals(cacheNoticeCount) && unReadGolbalSize.equals(cacheGolbalCount) && unReadPrivateSize.equals(cachePrivateCount)) {
+            // 未读信息添加到message表中
+            addUnReadMsg(userId);
+            if (count <= 10) {
+                Thread.sleep(2000);
+            } else if (count > 10 && count <= 15) {
+                Thread.sleep(3000);
+            } else {
+                Thread.sleep(3000);
+                putMapAndSetValues(userId, unReadNoticeSize, unReadGolbalSize, unReadPrivateSize, unReadAll);
+                return unReadSizeDTO;
+            }
+
+            unReadNoticeSize = messageDao.countByReceiverIdAndReadStatusAndMessageType(userId, MessageReadStatus.UN_READ, MessageType.PUBLIC);
+            unReadGolbalSize = messageDao.countByReceiverIdAndReadStatusAndMessageType(userId, MessageReadStatus.UN_READ, MessageType.GLOBAL);
+            unReadPrivateSize = messageDao.countByReceiverIdAndReadStatusAndMessageType(userId, MessageReadStatus.UN_READ, MessageType.PRIVATE_LETTET);
+            unReadAll = unReadNoticeSize + unReadGolbalSize + unReadPrivateSize;
+            count++;
+        }
+
+        // 未读信息添加到message表中
+        addUnReadMsg(userId);
+        putMapAndSetValues(userId, unReadNoticeSize, unReadGolbalSize, unReadPrivateSize, unReadAll);
+        return unReadSizeDTO;
+    }
+
+    private void putMapAndSetValues(Long userId, Integer unReadNoticeSize, Integer unReadGolbalSize, Integer unReadPrivateSize, Integer unReadAll) {
+        putMap(userId, unReadNoticeSize, unReadGolbalSize, unReadPrivateSize, unReadAll);
+        setValues(unReadNoticeSize, unReadGolbalSize, unReadPrivateSize, unReadAll);
+    }
+
+    private void putMap(Long userId, Integer unReadNoticeSize, Integer unReadGolbalSize, Integer unReadPrivateSize, Integer unReadAll) {
+        countMap.put(userId, unReadAll);
+        countNoticeMap.put(userId, unReadNoticeSize);
+        countGlobalMap.put(userId, unReadGolbalSize);
+        countPrivateMap.put(userId, unReadPrivateSize);
+    }
+
+    private void setValues(Integer unReadNoticeSize, Integer unReadGolbalSize, Integer unReadPrivateSize, Integer unReadAll) {
+        unReadSizeDTO.setAllUnRead(unReadAll);
+        unReadSizeDTO.setNoticeUnRead(unReadNoticeSize);
+        unReadSizeDTO.setGlobalUnRead(unReadGolbalSize);
+        unReadSizeDTO.setPrivateUnRead(unReadPrivateSize);
     }
 
     /**
      * 查询所有未读信息
      */
+    @Deprecated
     public RestResp unReadCount(Long userId, Integer tip){
         try {
             int count = 0;
@@ -160,7 +207,8 @@ public class MessageService {
         return RestResp.fail("操作失败");
     }
 
-    public UnReadSizeDTO invokeDb(Long userId, Integer tip, Integer count) throws InterruptedException {
+    @Deprecated
+    public UnReadSizeDTO invokeDb(Long userId, Integer tip, Integer count) throws Exception {
         // 用户登录后，将所在用户组未读公告信息添加到message表中
         addUnReadMsg(userId);
 
@@ -225,14 +273,14 @@ public class MessageService {
 
     }
 
-    private void addUnReadMsg(Long userId) {
+    @Transactional(Transactional.TxType.NEVER)
+    private void addUnReadMsg(Long userId) throws Exception{
         // 先找到roleId，然后得到角色userGroup，然后根据msgType和userGroup得到id
         User user = userDao.findOne(userId);
         if (user != null) {
             Long userGroup = user.getRoleId();
-            // TODO 待修改，只能查找指定用户组，如果当前userGroup是2（仲裁），不能查找4（所有人，包括2）的
-            List<MessageText> messageTextList = messageTextDao.findByMessageTypeAndUserGroup(MessageType.PUBLIC, userGroup);
-
+            List<MessageText> messageTextList = messageTextDao.findByMessageTypeAndUserGroup(MessageType.PUBLIC, userGroup, 4L);
+            //System.out.println("messageTextDao ---------------> " + messageTextDao);
             if (messageTextList.size() != 0) {
                 for (MessageText mt : messageTextList) {
                     set.add(mt.getId());
@@ -272,7 +320,7 @@ public class MessageService {
             messageText.setImageName(systemDefaultImage);
         } else {
             User user = userDao.findOne(sendId);
-            String imageName = user.getImage();
+            String imageName = user.getAvatar();
             if (null == imageName){
                 // 设置默认用户头像
                 messageText.setImageName(userDefaultImage);
@@ -283,7 +331,7 @@ public class MessageService {
 
         // 获取
         String orderId = messageText.getOrderId();
-        Order orders = orderDao.findById(orderId);
+        Order orders = orderDao.findOne(orderId);
         Long buyerId = orders.getBuyerId();
         Long sellerId = orders.getSellerId();
         if (userId.equals(buyerId)){
@@ -339,5 +387,25 @@ public class MessageService {
             LOG.error("站内信：获取私信信息异常");
         }
         return RestResp.fail("操作失败");
+    }
+    public String select(boolean flag)throws  Exception{
+        while (flag){
+            System.out.println(this.selects());
+            Thread.sleep(1000);
+            if(1 == 2){
+                return "s";
+            }
+        }
+        String s = "sss";
+        return s;
+    }
+
+    public Integer selects(){
+        try {
+            addUnReadMsg(22L);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return messageDao.countByReceiverIdAndReadStatus(22L,1);
     }
 }

@@ -7,6 +7,8 @@ import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.*;
 import org.web3j.abi.datatypes.generated.Uint256;
+import org.web3j.abi.datatypes.generated.Uint32;
+import org.web3j.abi.datatypes.generated.Uint8;
 import org.web3j.crypto.Credentials;
 import org.web3j.utils.Convert;
 
@@ -27,7 +29,7 @@ public class TrusteeContract extends AbstractContract{
     /**
      * trustee contract
      */
-    protected static final String CONTRACT_ADDRESS = "0xf0b7cbdC7b90bAFa995Fe63c680b49c64dddD36f";
+    protected String CONTRACT_ADDRESS = "0x73dc1dc73d4395fcc7afe234ebb606aa09236b44";
 
     public TrusteeContract(Credentials credentials) {
         this.credentials = credentials;
@@ -37,10 +39,15 @@ public class TrusteeContract extends AbstractContract{
         initCredentials(password, source);
     }
 
+    public TrusteeContract(String password, String source, String contract) {
+        initCredentials(password, source);
+        this.CONTRACT_ADDRESS = contract;
+    }
+
     public String addTrustee(String id, BigInteger fame,String publicKey){
         Function function = new Function("addTrustee",
                 Arrays.asList(new Address(id),
-                new Uint256(fame),
+                new Uint32(fame),
                 new Utf8String(publicKey)), Collections.<TypeReference<?>>emptyList());
         String result = transaction(CONTRACT_ADDRESS,function, credentials);
         return result;
@@ -55,7 +62,7 @@ public class TrusteeContract extends AbstractContract{
 
     public String updateTrusteeFame(String id, BigInteger newFame){
         Function function = new Function("updateTrusteeFame",
-                Arrays.asList(new Address(id), new Uint256(newFame)), Collections.<TypeReference<?>>emptyList());
+                Arrays.asList(new Address(id), new Uint32(newFame)), Collections.<TypeReference<?>>emptyList());
         String result = transaction(CONTRACT_ADDRESS,function, credentials);
         return result;
     }
@@ -98,7 +105,7 @@ public class TrusteeContract extends AbstractContract{
         return result;
     }
 
-    public String getTrustees(BigInteger num) {
+    public String getTrustees(Integer num) {
         List<String> addresses = null;
         Function function = new Function("getTrustees",Arrays.asList(new Uint256(num)), Collections.<TypeReference<?>>emptyList());
         String result = transaction(CONTRACT_ADDRESS, function, credentials);

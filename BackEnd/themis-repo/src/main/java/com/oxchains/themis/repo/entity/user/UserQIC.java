@@ -14,11 +14,8 @@ import javax.persistence.*;
 @Entity
 @Table(name = "user_qic")
 public class UserQIC {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
 
-    @Column(unique = true)
+    @Id
     private Long userId;
 
     private String realName;
@@ -26,7 +23,9 @@ public class UserQIC {
     @Column(unique = true)
     private String idNo;
 
-    //身份证照片正面的 图片url
+    private Long createTime;
+
+/*    //身份证照片正面的 图片url
     private String photoFront;
 
     //身份证照片背面的 图片url
@@ -34,5 +33,5 @@ public class UserQIC {
 
     //查询时返回的头像照片base64编码
     @Column(length = 20480)
-    private String photo;
+    private String photo;*/
 }

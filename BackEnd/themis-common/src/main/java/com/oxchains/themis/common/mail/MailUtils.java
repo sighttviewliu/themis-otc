@@ -1,6 +1,5 @@
 package com.oxchains.themis.common.mail;
 
-import com.oxchains.themis.common.model.RestResp;
 import com.oxchains.themis.common.util.RegexUtils;
 import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
@@ -66,7 +65,7 @@ public class MailUtils {
     private MailUtils(){}
 
 
-    public static void main(String[] args) {
+    public static void test(String[] args) {
         System.out.println(checkMail("528050239@qq.com"));
     }
 }

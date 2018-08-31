@@ -5,44 +5,61 @@
     <parent>
         <artifactId>themis</artifactId>
         <groupId>com.oxchains</groupId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>themis-user</artifactId>
     <dependencies>
-        <dependency>
+
+        <!--<dependency>
             <groupId>com.oxchains</groupId>
             <artifactId>bitcoin-rpc-client</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>com.oxchains</groupId>
             <artifactId>themis-common</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.oxchains</groupId>
             <artifactId>themis-repo</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
         <!--<dependency>-->
-            <!--<groupId>info.blockchain</groupId>-->
-            <!--<artifactId>api</artifactId>-->
-            <!--<version>LATEST</version>-->
+        <!--<groupId>info.blockchain</groupId>-->
+        <!--<artifactId>api</artifactId>-->
+        <!--<version>LATEST</version>-->
         <!--</dependency>-->
+        <!--
+
+                <dependency>
+                    <groupId>com.oxchains</groupId>
+                    <artifactId>themis-file</artifactId>
+                    <version>1.0.1-SNAPSHOT</version>
+                </dependency>
+        -->
+
+        <!-- https://mvnrepository.com/artifact/dom4j/dom4j -->
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+
 
         <dependency>
-            <groupId>com.oxchains</groupId>
-            <artifactId>themis-file</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <groupId>com.sendgrid</groupId>
+            <artifactId>sendgrid-java</artifactId>
+            <version>4.1.2</version>
         </dependency>
     </dependencies>
     <build>
-        <plugins>
+        <!--<plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -58,17 +75,33 @@
                     <repository>${docker.image.prefix}/${project.artifactId}</repository>
                 </configuration>
             </plugin>
-        </plugins>
+        </plugins>-->
+        <!--   <resources>
+               <resource>
+                   <directory>src/main/java</directory>
+                   <includes>
+                       <include>**/*.xml</include>
+                   </includes>
+               </resource>
+               <resource>
+                   <directory>src/main/resources</directory>
+                   <includes>
+                       <include>**.*</include>
+                       <include>**/*.*</include>
+                       <include>**/*/*.*</include>
+                   </includes>
+               </resource>
+           </resources>-->
     </build>
 
     <!--<repositories>-->
-        <!--<repository>-->
-            <!--<id>api-v1-client-java-mvn-repo</id>-->
-            <!--<url>https://raw.githubusercontent.com/blockchain/api-v1-client-java/mvn-repo/</url>-->
-            <!--<snapshots>-->
-                <!--<enabled>true</enabled>-->
-                <!--<updatePolicy>always</updatePolicy>-->
-            <!--</snapshots>-->
-        <!--</repository>-->
+    <!--<repository>-->
+    <!--<id>api-v1-client-java-mvn-repo</id>-->
+    <!--<url>https://raw.githubusercontent.com/blockchain/api-v1-client-java/mvn-repo/</url>-->
+    <!--<snapshots>-->
+    <!--<enabled>true</enabled>-->
+    <!--<updatePolicy>always</updatePolicy>-->
+    <!--</snapshots>-->
+    <!--</repository>-->
     <!--</repositories>-->
 </project>

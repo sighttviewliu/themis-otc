@@ -10,7 +10,6 @@ import com.oxchains.themis.notice.domain.BTCResult;
 import com.oxchains.themis.notice.domain.BTCTicker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -27,19 +26,22 @@ public class BTCListener {
 
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-    @Resource private BTCResultDao btcResultDao;
-    @Resource private BTCMarketDao btcMarketDao;
-    @Resource private BTCTickerDao btcTickerDao;
+    @Resource
+    private BTCResultDao btcResultDao;
+    @Resource
+    private BTCMarketDao btcMarketDao;
+    @Resource
+    private BTCTickerDao btcTickerDao;
 
     /**
      * 调度器
      * 每间隔 12 分钟执行一次
-     *
+     * <p>
      * 如果行情获取失败，就return
      * 如果行情获取成功，就保存，且数据库只保存一条btc-cny的信息，新得信息就update
      */
 //    @Scheduled(fixedRate = 1000 * 720)
-    public void queryBTCMarket(){
+    public void queryBTCMarket() {
         try {
             String currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             LOG.info("Timed tasks begin to run：{} BTC market", currentTime);
@@ -54,15 +56,15 @@ public class BTCListener {
             List<BTCResult> btcResultList = btcResultDao.findByIsSuc("true");
             List<BTCMarket> btcMarketList = btcMarketDao.findBySymbol("huobibtccny");
             List<BTCTicker> btcTickerList = btcTickerDao.findBySymbol("btccny");
-            if(!btcResultList.isEmpty() && !btcMarketList.isEmpty() && !btcTickerList.isEmpty()){
-                for (int i=0; i<btcResultList.size(); i++){
+            if (!btcResultList.isEmpty() && !btcMarketList.isEmpty() && !btcTickerList.isEmpty()) {
+                for (int i = 0; i < btcResultList.size(); i++) {
                     BTCResult btcResultInfo = btcResultList.get(i);
                     btcResultInfo.setDes(btcResult.getDes());
                     btcResultInfo.setIsSuc(btcResult.getIsSuc());
                     btcResultInfo.setDatas(btcResult.getDatas());
                     btcResultDao.save(btcResultInfo);
                 }
-                for (int i=0; i<btcMarketList.size(); i++){
+                for (int i = 0; i < btcMarketList.size(); i++) {
                     BTCMarket btcMarketInfo = btcMarketList.get(i);
                     btcMarketInfo.setCName(btcResult.getDatas().getCName());
                     btcMarketInfo.setCoinId(btcResult.getDatas().getCoinId());
@@ -79,7 +81,7 @@ public class BTCListener {
                     btcMarketInfo.setTicker(btcResult.getDatas().getTicker());
                     btcMarketDao.save(btcMarketInfo);
                 }
-                for (int i=0; i<btcTickerList.size(); i++){
+                for (int i = 0; i < btcTickerList.size(); i++) {
                     BTCTicker btcTickerInfo = btcTickerList.get(i);
                     btcTickerInfo.setBuy(btcResult.getDatas().getTicker().getBuy());
                     btcTickerInfo.setBuydollar(btcResult.getDatas().getTicker().getBuydollar());
@@ -97,18 +99,19 @@ public class BTCListener {
                     btcTickerInfo.setVol(btcResult.getDatas().getTicker().getVol());
                     btcTickerDao.save(btcTickerInfo);
                 }
-            }else {
-                if (btcResult.getIsSuc().equals("false")){
+            } else {
+                if (btcResult.getIsSuc().equals("false")) {
                     return;
-                }else {
+                } else {
                     btcResultDao.save(btcResult);
                     btcMarketDao.save(btcResult.getDatas());
                     btcTickerDao.save(btcResult.getDatas().getTicker());
                 }
 
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.error("定时任务：获取BTC深度行情异常", e);
         }
     }
+
 }

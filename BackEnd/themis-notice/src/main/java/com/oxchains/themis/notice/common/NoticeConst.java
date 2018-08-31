@@ -47,4 +47,60 @@ public interface NoticeConst {
             return name;
         }
     }
+
+    /**
+     * 支持的交易币种
+     * 比特币、以太坊、Themis
+     */
+
+    enum CoinType{
+        BTC(1L,"BTC"),ETH(2L,"ETH"),GET(3L,"GET");
+
+        private Long status;
+        private String name;
+
+        CoinType(Long status, String name) {
+            this.status = status;
+            this.name = name;
+        }
+
+        public Long getStatus() {
+            return status;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
+    //下架公告是否已经被删除，0未删除，1已删除
+    enum IsDelete{
+        EXIST(0L),NOTEXIST(1L);
+
+
+        private Long status;
+
+        IsDelete(Long status) {
+            this.status = status;
+        }
+
+        public Long getStatus() {
+            return status;
+        }
+    }
+
+    //交易所
+    enum Exchange{
+        AVERAGE(1L),COINMARKETCAP(2L),BITSTAMP(3L),BITFINEX(4L);
+
+        private Long status;
+
+        Exchange(Long status) {
+            this.status = status;
+        }
+
+        public Long getStatus() {
+            return status;
+        }
+    }
 }

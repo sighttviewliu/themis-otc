@@ -34,7 +34,8 @@ public class RandomUtil {
         return combination;
     }
     public static Long getRandomNumber(int length){
-        StringBuffer stringBuffer = new StringBuffer();
+        return System.currentTimeMillis();
+        /*StringBuffer stringBuffer = new StringBuffer();
         Random random = new Random();
         for (int i = 0; i < length; i++) {
             int randomInt = random.nextInt(9) + 1;
@@ -42,6 +43,6 @@ public class RandomUtil {
             stringBuffer.append(String.valueOf(randomInt));
 
         }
-        return Long.parseLong(stringBuffer.toString());
+        return Long.parseLong(stringBuffer.toString());*/
     }
 }

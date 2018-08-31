@@ -2,8 +2,8 @@ FROM java:8
 #FROM ubuntu:latest
 MAINTAINER oxchains
 VOLUME /home/container
-ADD ./target/themis-user-1.0.1-SNAPSHOT.jar app.jar
-#ADD themis-user-1.0.1-SNAPSHOT.jar app.jar
+ADD ./target/themis-user-1.0.0.jar app.jar
+#ADD themis-user-1.0.0.jar app.jar
 
 #ADD jdk8.tar.gz /usr/java/
 ENV JAVA_HOME=/usr/java/jdk1.8.0_152
