@@ -20,52 +20,5 @@ public class RegisterRequest {
     private String image;
     private MultipartFile[] files;
 
-    public MultipartFile[] getFiles() {
-        return files;
-    }
-
-    public void setFiles(MultipartFile[] files) {
-        this.files = files;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public MultipartFile getMultipartFile() {
-        return multipartFile;
-    }
-
-    public void setMultipartFile(MultipartFile multipartFile) {
-        this.multipartFile = multipartFile;
-    }
 
 }

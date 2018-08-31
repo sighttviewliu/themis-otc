@@ -1,7 +1,9 @@
 package com.oxchains.themis.chat.websocket;
 
+import com.oxchains.themis.chat.service.ChatService;
 import com.oxchains.themis.chat.service.KafkaService;
 import com.oxchains.themis.chat.service.MessageService;
+import com.oxchains.themis.chat.service.SensitiveWordFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -22,6 +24,10 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
     private KafkaService kafkaService;
     @Resource
     private MessageService messageService;
+    @Resource
+    private SensitiveWordFilter sensitiveWordFilter;
+    @Resource
+    private ChatService chatService;
 
     public StartupListener() {
 
@@ -29,6 +35,8 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        new Thread(new WebSocketServer(kafkaService, port, messageService)).start();
+        new Thread(new WebSocketServer(kafkaService, port, messageService, chatService)).start();
+        //初始化敏感字库
+        sensitiveWordFilter.initKeyWord();
     }
 }

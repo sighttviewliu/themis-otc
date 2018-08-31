@@ -37,7 +37,13 @@ public class MessageService {
     private OrderArbitrateRepo orderArbitrateRepo;
     public static final Integer BUYER_SUCCESS = 1;
 
-    //仲裁投票后给双方的站内信
+    /**
+     * 仲裁投票后给双方的站内信
+     *
+     * @param orders
+     * @param userId
+     * @param successId
+     */
     public void postArbitrateMessage(Orders orders, Long userId, Integer successId) {
         try {
             String username = this.getUserById(userId).getLoginname();
@@ -57,7 +63,11 @@ public class MessageService {
         }
     }
 
-    //仲裁完成后给双方的站内信
+    /**
+     * 仲裁完成后给双方的站内信
+     *
+     * @param orders
+     */
     public void postArbitrateFinish(Orders orders) {
         try {
             Long successId = null;
@@ -88,7 +98,12 @@ public class MessageService {
         }
     }
 
-    //发起仲裁时的给三方的站内信
+    /**
+     * 发起仲裁时的给三方的站内信
+     *
+     * @param orders
+     * @param userId
+     */
     public void postEvidenceMessage(Orders orders, Long userId) {
         try {
             //发起提起仲裁的人的站内信
@@ -120,7 +135,12 @@ public class MessageService {
         }
     }
 
-    //上传仲裁凭据的站内信
+    /**
+     * 上传仲裁凭据的站内信
+     *
+     * @param orders
+     * @param userId
+     */
     public void postUploadEvidence(Orders orders, Long userId) {
         try {
             //上传交易凭据 附件的人的站内信

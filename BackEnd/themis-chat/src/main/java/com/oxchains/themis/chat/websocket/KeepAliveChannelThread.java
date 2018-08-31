@@ -1,5 +1,9 @@
 package com.oxchains.themis.chat.websocket;
 
+import com.oxchains.themis.chat.entity.HeartBeat;
+import com.oxchains.themis.chat.entity.Request;
+import com.oxchains.themis.chat.entity.User;
+import com.oxchains.themis.chat.service.ChatService;
 import io.netty.channel.ChannelFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,34 +19,29 @@ import java.util.concurrent.TimeUnit;
 public class KeepAliveChannelThread implements Runnable {
     private ScheduledExecutorService keepAliveScheduler;
     private long keepTime;
+    private ChatService chatService;
     private static final Logger LOG = LoggerFactory.getLogger(KeepAliveChannelThread.class);
 
-    public KeepAliveChannelThread(ScheduledExecutorService keepAliveScheduler, long keepTime) {
+    public KeepAliveChannelThread(ScheduledExecutorService keepAliveScheduler, long keepTime, ChatService chatService) {
         this.keepAliveScheduler = keepAliveScheduler;
         this.keepTime = keepTime;
+        this.chatService = chatService;
     }
 
     @Override
     public void run() {
         try {
-            for (String s : ChatUtil.userChannels.keySet()) {
-                for (String s1 : ChatUtil.userChannels.get(s).keySet()) {
-                    if (System.currentTimeMillis() - ChatUtil.userChannels.get(s).get(s1).getLastUseTime() > (3 * 1000)) {
-                        ChannelFuture cf = ChatUtil.userChannels.get(s).get(s1).getChannel().closeFuture();
-                        cf.channel().close().sync();
-                        ChatUtil.userChannels.get(s).remove(s1);
-                        TextWebSocketFrameHandler.channels.remove(cf.channel());
-                    }
+            for (Long s : SessionManager.getOnlineUsers()) {
+                if (!SessionManager.getSession(s).isAlive()) {
+                    Session session = SessionManager.getSession(s);
+                    System.out.println("removeSession --> " + ((User) session.getAttachment()).getId());
+                    //用户不活动是移除该用户在redis中的用户信息
+                    chatService.removeUserInfoFromRedis(((User) session.getAttachment()).getId());
+                    session.removeAttachment();
+                    SessionManager.removeSession(s);
+                    session.close();
                 }
             }
-        /*for (String s : ChatUtil.txChannels.keySet()){
-            if(System.currentTimeMillis() - ChatUtil.txChannels.get(s).getLastUseTime() > 3*1000){
-                ChannelFuture channelFuture = ChatUtil.txChannels.get(s).getChannel().closeFuture();
-                channelFuture.channel().close().sync();
-                ChatUtil.txChannels.remove(s);
-                TextWebSocketFrameHandler.channels.remove(channelFuture.channel());
-            }
-        }*/
         } catch (Exception e) {
             LOG.error("Keep Alive websocket channel faild : {}", e);
         }

@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * create by huohuo
+ *
  * @author huohuo
  */
 @SpringBootApplication
@@ -17,8 +18,9 @@ import org.springframework.web.client.RestTemplate;
 @EnableHystrix
 public class ChatApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ChatApplication.class,args);
+        SpringApplication.run(ChatApplication.class, args);
     }
+
     @Bean
     @LoadBalanced
     RestTemplate restTemplate() {
