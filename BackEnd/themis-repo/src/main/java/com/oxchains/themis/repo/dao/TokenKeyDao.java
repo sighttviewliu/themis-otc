@@ -13,4 +13,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TokenKeyDao extends CrudRepository<TokenKey,Long>,java.io.Serializable {
+    TokenKey findTokenKeyById(Long id);
 }

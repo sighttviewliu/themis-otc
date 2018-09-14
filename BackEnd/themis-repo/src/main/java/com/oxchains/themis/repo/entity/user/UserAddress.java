@@ -21,5 +21,7 @@ public class UserAddress {
     private Long userId;
     private Integer type;//BTC ETH
     private String address;
+    private Integer enabled = 1;
+    private Integer defaulted = 0;
     private String remark;
 }

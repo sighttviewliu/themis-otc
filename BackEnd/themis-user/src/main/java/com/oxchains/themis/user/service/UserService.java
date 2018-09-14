@@ -19,6 +19,7 @@ import com.oxchains.themis.common.model.RestResp;
 import com.oxchains.themis.common.param.ParamType;
 import com.oxchains.themis.common.param.RequestBody;
 import com.oxchains.themis.common.param.VerifyCode;
+import com.oxchains.themis.common.sms.SmsService;
 import com.oxchains.themis.common.util.*;
 import com.oxchains.themis.repo.dao.order.OrderRepo;
 import com.oxchains.themis.repo.dao.user.*;
@@ -60,8 +61,6 @@ import static com.google.common.collect.Lists.newArrayList;
 @Service
 public class UserService extends BaseService {
 
-    //private static final Logger log = LoggerFactory.getLogger(UserService.class);
-
     @Resource
     private UserDao userDao;
 
@@ -96,7 +95,7 @@ public class UserService extends BaseService {
     private SendGridService sendGridService;
 
     @Resource
-    private SmsService smsService;
+    private SmsService1 smsService;
 
     private String token;
 
@@ -259,14 +258,6 @@ public class UserService extends BaseService {
             log.error("保存用户信息异常", e);
             return RestResp.fail("操作失败");
         }
-    }
-
-    @Deprecated
-    public String _queryRedisValue(String key) {
-        ValueOperations operations = redisTemplate.opsForValue();
-        String value = (String) operations.get(key);
-        System.out.println("UserService：redis中的token = " + value);
-        return value;
     }
 
     private void saveRedis(User save, String originToken) {
@@ -546,6 +537,36 @@ public class UserService extends BaseService {
         return RestResp.success(vo);
     }
 
+    public RestResp getUserById(Long id){
+        if (null == id) {
+            return RestResp.fail("User Id requied, but null");
+        }
+        try{
+            User user = userDao.findUserById(id);
+            if(null == user){
+                return RestResp.fail("User not exist");
+            }
+            return RestResp.success(user);
+        }catch (Exception e){
+            log.error("", e);
+            return RestResp.fail("Find user by Id error: ", e);
+        }
+    }
+    public RestResp getUserByLoginname(String loginname){
+        if (null == loginname || "".equals(loginname.trim())) {
+            return RestResp.fail("Login name requied, but null");
+        }
+        try{
+            User user = userDao.findByLoginname(loginname);
+            if(null == user){
+                return RestResp.fail("User not exist");
+            }
+            return RestResp.success(user);
+        }catch (Exception e){
+            log.error("", e);
+            return RestResp.fail("Find user by login name error: ", e);
+        }
+    }
     public boolean saveVcode(String key, String vcode) {
         try {
             ValueOperations<String, String> ops = redisTemplate.opsForValue();
@@ -1222,7 +1243,7 @@ public class UserService extends BaseService {
             List<UserPayment> list = null;
             UserPayment payment = new UserPayment();
             if (vo.getId() != null) {
-                payment = userPaymentRepo.findOne(vo.getId());
+                payment = userPaymentRepo.findUserPaymentById(vo.getId());
                 if (null != payment) {
                     vo.setCreateTime(payment.getCreateTime());
                     //vo.setUpdateTime(System.currentTimeMillis());
@@ -1357,16 +1378,31 @@ public class UserService extends BaseService {
             return RestResp.fail();
         }
         try {
-            if (userAddress.getType().intValue() == Const.DIGICCY.BTC.getType() && !RegexUtils.match(userAddress.getAddress(), RegexUtils.REGEX_BTC_ADDRESS)) {
-                return RestResp.fail("BTC 地址格式不正确");
+            boolean flag = false;
+            if(null != userAddress.getType() && Const.DIGICCY.BTC.getType() == userAddress.getType()){
+                flag = CoinAddressValidateUtil.bitcoinAddressValidate(userAddress.getAddress());
+            } else {
+                flag =CoinAddressValidateUtil.isETHValidAddress(userAddress.getAddress());
+            }
+            if(!flag){
+                return RestResp.fail("输入地址不合法");
             }
             UserAddress userAddress1 = userAddressRepo.findByUserIdAndAddress(userAddress.getUserId(), userAddress.getAddress());
             if (null != userAddress1) {
                 return RestResp.fail("地址已存在");
             }
             userAddress.setCreateTime(System.currentTimeMillis());
-            userAddress = userAddressRepo.save(userAddress);
-            return RestResp.success(userAddress);
+            userAddress1 = userAddressRepo.save(userAddress);
+
+            /**
+             * 只有当前地址时设为默认地址
+             */
+            List<UserAddress> list = userAddressRepo.findByUserIdAndType(userAddress.getUserId(), userAddress.getType());
+            if(null != list && list.size() == 1 && list.get(0).getAddress().equals(userAddress1.getAddress())){
+                userAddress1.setDefaulted(1);
+                userAddress1 = userAddressRepo.save(userAddress1);
+            }
+            return RestResp.success(userAddress1);
         } catch (Exception e) {
             log.error("", e);
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -1437,6 +1473,7 @@ public class UserService extends BaseService {
 
             UserAddrVO vo = new UserAddrVO(userId);
             vo.setAddresses(new ArrayList<>());
+            Address get = new Address("GET", new ArrayList<>());
             Address btc = new Address("BTC", new ArrayList<>());
             Address eth = new Address("ETH", new ArrayList<>());
             if (null != userAddress && userAddress.size() > 0) {
@@ -1447,7 +1484,9 @@ public class UserService extends BaseService {
                     map = new HashMap<>(1);
                     map.put("addr", address);
                     map.put("remark", uaddr.getRemark());
-                    if (Const.VCURR.BTC.getType() == type) {
+                    if(Const.VCURR.GET.getType() == type){
+                        get.getAddress().add(map);
+                    }else if (Const.VCURR.BTC.getType() == type) {
                         btc.getAddress().add(map);
                     } else if (Const.VCURR.ETH.getType() == type) {
                         eth.getAddress().add(map);
@@ -1455,10 +1494,9 @@ public class UserService extends BaseService {
 
                     }
                 }
-                //vo.getAddresses().add(btc);
-                //vo.getAddresses().add(eth);
             }
             vo.getAddresses().add(btc);
+            vo.getAddresses().add(get);
             return RestResp.success("", vo);
         } catch (Exception e) {
             log.error("", e);
@@ -1466,6 +1504,75 @@ public class UserService extends BaseService {
         return RestResp.fail();
     }
 
+    public RestResp setDefaultAddresses(UserAddressVO vo) {
+        if (null == vo) {
+            return RestResp.fail();
+        }
+        try {
+            List<UserAddress> userAddresses = userAddressRepo.findByUserIdAndType(vo.getUserId(), vo.getType());
+            if(null == userAddresses || userAddresses.size() < 1){
+                return RestResp.fail("Addresses Not Exist");
+            }
+            UserAddress def = null;
+            if(null != vo.getAddress()){
+                UserAddress voaddr = null;
+                for(UserAddress userAddress : userAddresses){
+                    if(userAddress.getAddress().equals(vo.getAddress())){
+                        voaddr = userAddress;
+                    }
+                    if(userAddress.getDefaulted() == 1){
+                        def = userAddress;
+                    }
+                }
+                if(null == voaddr){
+                    return RestResp.fail("Assigned Address Not Exist");
+                }
+                if(null == def){
+                    voaddr.setDefaulted(1);
+                    def = userAddressRepo.save(voaddr);
+                }else if(!voaddr.getAddress().equals(def.getAddress())){
+                    def.setDefaulted(0);
+                    def = userAddressRepo.save(def);
+                    voaddr.setDefaulted(1);
+                    def = userAddressRepo.save(voaddr);
+                }
+            }else {
+                for(UserAddress userAddress : userAddresses){
+                    if(userAddress.getDefaulted() == 1){
+                        def = userAddress;
+                    }
+                }
+                if(null == def){
+                    Collections.sort(userAddresses, new Comparator<UserAddress>() {
+                        @Override
+                        public int compare(UserAddress o1, UserAddress o2) {
+                            return (int) (o1.getCreateTime() - o2.getCreateTime());
+                        }
+                    });
+                    def = userAddresses.get(0);
+                    def.setDefaulted(1);
+                    def = userAddressRepo.save(def);
+                }
+            }
+           return RestResp.success("", def);
+        } catch (Exception e) {
+            log.error("", e);
+        }
+        return RestResp.fail();
+    }
+
+    public RestResp getDefaultAddresses(Long userId, Integer addtype) {
+        if (null == userId) {
+            return RestResp.fail();
+        }
+        try {
+            UserAddress userAddress = userAddressRepo.findUserAddressByUserIdAndTypeAndDefaulted(userId, addtype, 1);
+            return RestResp.success("", null != userAddress ? userAddress.getAddress() : null);
+        } catch (Exception e) {
+            log.error("", e);
+        }
+        return RestResp.fail();
+    }
 
     public RestResp getUserTxDetails(Long userId) {
         if (null == userId) {

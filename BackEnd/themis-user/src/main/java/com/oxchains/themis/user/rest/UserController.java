@@ -47,14 +47,7 @@ public class UserController {
     @Resource
     CaptchaService captchaService;
 
-    //@Value("${user.info.image}")
     private String imageUrl;
-
-    @GetMapping(value = "/queryRedis/{key}")
-    public String exist(@PathVariable String key) {
-        return JsonUtil.toJson(userService._queryRedisValue(key));
-    }
-
 
     /**
      * Verification Code
@@ -138,6 +131,18 @@ public class UserController {
         return JsonUtil.toJson(userService.getUser(id));
     }
 
+    @ControllerLogs(description = "获取用户信息{id}")
+    @GetMapping(value = "/userid/{userId}")
+    public RestResp getUserById(@PathVariable Long userId) {
+        return userService.getUserById(userId);
+    }
+
+    @ControllerLogs(description = "获取用户信息{loginname}")
+    @GetMapping(value = "/loginname/{loginname}")
+    public RestResp getUser(@PathVariable String loginname) {
+        return userService.getUserByLoginname(loginname);
+    }
+
     /**
      * 图片验证码
      */
@@ -215,7 +220,7 @@ public class UserController {
      */
     @ControllerLogs(description = "验证验证码")
     @RequestMapping("/verifyICode")
-    public RestResp verifytKaptchaCode(VerifyCode vcode, HttpServletRequest request, HttpServletResponse response) {
+    public RestResp verifytKaptchaCode(@RequestBody VerifyCode vcode, HttpServletRequest request) {
        return userService.verifytKaptchaCode(vcode);
     }
 
@@ -455,9 +460,22 @@ public class UserController {
         return userService.getAddresses(userId, null);
     }
 
+    @ControllerLogs(description = "分类获取地址")
     @GetMapping(value = "/vaddress/{userId}/{type}")
     public RestResp getAddress(@PathVariable Long userId, @PathVariable Integer type){
         return userService.getAddresses(userId, type);
+    }
+
+    @ControllerLogs(description = "设置默认地址")
+    @GetMapping(value = "/vaddress/default/set/{userId}/{type}")
+    public RestResp setDefaultAddress(@RequestBody UserAddressVO vo){
+        return userService.setDefaultAddresses(vo);
+    }
+
+    @ControllerLogs(description = "分类获取默认地址")
+    @GetMapping(value = "/vaddress/default/{userId}/{type}")
+    public RestResp getDefaultAddress(@PathVariable Long userId, @PathVariable Integer type){
+        return userService.getDefaultAddresses(userId, type);
     }
 
     /**
@@ -503,4 +521,5 @@ public class UserController {
     public RestResp setphone(@RequestBody ReqParam param){
         return userService.adminUser(param);
     }
+
 }

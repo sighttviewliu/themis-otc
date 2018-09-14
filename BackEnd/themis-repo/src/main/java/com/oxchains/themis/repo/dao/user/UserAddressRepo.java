@@ -16,8 +16,9 @@ public interface UserAddressRepo extends CrudRepository<UserAddress,Long> {
     List<UserAddress> findByUserIdOrderByTypeAscCreateTimeDesc(Long userId);
     List<UserAddress> findByUserIdAndTypeOrderByCreateTimeDesc(Long userId, Integer type);
     UserAddress findByAddress(String address);
+    List<UserAddress> findByUserIdAndType(Long userId, Integer type);
     UserAddress findByUserIdAndAddress(Long userId, String address);
     List<UserAddress> findByAddressIn(List<String> addresses);
-
+    UserAddress findUserAddressByUserIdAndTypeAndDefaulted(Long userid, Integer type, Integer defaulted);
     int deleteByAddress(String address);
 }

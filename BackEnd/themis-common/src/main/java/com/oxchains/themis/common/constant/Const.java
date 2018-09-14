@@ -149,6 +149,7 @@ public interface Const {
      }
 
      enum VCURR implements Const{
+        GET(0,"GET"),
         BTC(1,"BTC"),
          ETH(2,"ETH");
         private int type;

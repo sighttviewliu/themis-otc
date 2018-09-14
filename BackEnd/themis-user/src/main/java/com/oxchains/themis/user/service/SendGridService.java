@@ -52,42 +52,6 @@ public class SendGridService {
         sg = new SendGrid(uresParam.getSendGridApiKey());
     }
 
-    /*private SendGridService() throws FileNotFoundException, DocumentException {
-        uresParam = new UResParam();
-        uresParam.setFromAddr("noreply@themis.network");
-        uresParam.setSendGridApiKey("1234567890");
-        sg = new SendGrid(uresParam.getSendGridApiKey());
-    }
-
-    public static void main(String[] args) throws IOException, DocumentException {
-        String fromAddress = "noreply@themis.network";
-        String toAddress = "brandon-zhong8859@foxmail.com";
-        String toAddress1 = "18296874638@163.com";
-        String toAddress2 = "845123849@qq.com";
-        String toAddress3 = "535904911@qq.com";
-        String toAddress4 = "1582812410@qq.com";
-        String presentDate = DateUtil.getPresentDate();
-        SendGridService sendGridService = new SendGridService();
-//        sendGridService.sendMail(fromAddress, toAddress, "mail test", "mail test  " + presentDate);
-//        sendGridService.sendMail(fromAddress, toAddress1, "mail test", "mail test  " + presentDate);
-//        sendGridService.sendMail(uresParam.getFromAddr(), toAddress2, "mail test", "mail test  " + presentDate);
-//        sendGridService.sendMail(fromAddress, toAddress3, "mail test", "mail test  " + presentDate);
-        File file = new File("E:\\var\\763293ce06bf1e684ef0ea3da43ae5008d8564b8.jpg");
-        File file1 = new File("E:\\var\\20180827145820.jpg");
-        File file2 = new File("E:\\var\\20180827153838.png");
-//        sendGridService.sendMailWithAttachments(toAddress, "mail test", "<br/>  time -->" + presentDate, Const.MAIL_TYPE_HTML, file, file1, file2);
-//        sendGridService.sendMailWithAttachments(toAddress1, "mail test", "mail test  " + presentDate, file, file1, file2);
-        Map<String, String> content = new HashMap<>();
-        content.put("time", presentDate);
-        content.put("name", "brandon");
-        content.put("message", "因为您、我有缘，所以才能共结一个圆。为进一步优化教育环境，加强家校互动，" +
-                "共同促进学生的成长和进步，本着家校共育的精神，我校决定召开高一家长会，希望你在百忙中抽出时间，" +
-                "拨冗光临，对孩子在家和在校的表现与各班主任进行深入的面对面交流，针对每个孩子的不同特点，" +
-                "与老师共同商讨教育孩子的策略，最大程度的促进您孩子的进步。");
-        sendGridService.sendHtmlMailWithAttachments(toAddress, "清华大学通知(Tsinghua University Notice)", content, "templates/emailTemplate.html", file, file1, file2);
-
-    }*/
-
     /**
      * 发送带附件的HTML形式邮件
      *
@@ -180,9 +144,9 @@ public class SendGridService {
             }
             return htmlTemplate.asXML();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("未找到相应的模板信息，{}", e);
         } catch (DocumentException e) {
-            e.printStackTrace();
+            log.error("模板解析错误，请检查是否有未知字符", e);
         }
         return "";
     }
@@ -223,14 +187,10 @@ public class SendGridService {
     }
 
     public void sendMail(String from, String to, String subject, String content) throws IOException {
-//        SendGrid sg = new SendGrid(/*sendGridApiKey*/uresParam.getSendGridApiKey());
         Request request = new Request();
         request.setMethod(Method.POST);
         request.setEndpoint("mail/send");
         Mail mail = toMail(from, to, subject, content, Const.MAIL_TYPE_TEXT);
-//        request.setBody("{\"personalizations\":[{\"to\":[{\"email\":\"" + to
-//                + "\"}],\"subject\":\"" + subject + "\"}],\"from\":{\"email\":\"" + from + "\"}," +
-//                "\"content\":[{\"type\":\"text/plain\",\"value\": \"" + content + "\"}]}");
         request.setBody(mail.build());
         Response response = sg.api(request);
         log.info(response.getStatusCode() + "");
@@ -244,12 +204,6 @@ public class SendGridService {
     }
 
     public void sendHtmlMail(String fromAddr, String toAddr, String subject, String context) throws IOException {
-//        Email from = new Email(fromAddr);
-//        Email  to = new Email(toAddr);
-//        Content content = new Content(MAIL_TYPE_HTML,context);
-//        Mail mail = new Mail(from, subject, to, content);
-//        sendMail(mail);
-
         sendMail(fromAddr, toAddr, subject, context, Const.MAIL_TYPE_HTML);
     }
 
@@ -272,14 +226,10 @@ public class SendGridService {
         Email to = new Email(toAddr);
         Content content = new Content(type, context);
         Mail mail = new Mail(from, subject, to, content);
-//        mail.personalization.get(0).addSubstitution("-name-", "Example User");
-//        mail.personalization.get(0).addSubstitution("-city-", "Denver");
-//        mail.setTemplateId("13b8f94f-bcae-4ec6-b752-70d6cb59f932");
         sendMail(mail);
     }
 
     private void sendMail(Mail mail) throws IOException {
-//        SendGrid sg = new SendGrid(/*sendGridApiKey*/uresParam.getSendGridApiKey());
         Request request = new Request();
         try {
             request.setMethod(Method.POST);

@@ -19,4 +19,5 @@ public interface UserPaymentRepo extends CrudRepository<UserPayment,Long> {
     List<UserPayment> findByUserIdAndPtypeAndEnabled(Long userId, Integer ptype, Integer enabled);
     List<UserPayment> findByUserIdAndEnabled(Long userId, Integer enabled);
     UserPayment findByUserIdAndPayment(Long userId, String payment);
+    UserPayment findUserPaymentById(Long id);
 }
