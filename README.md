@@ -19,11 +19,6 @@ user center
 orders 
 ```
 
-### themis-arbitrate 
-```
-arbitration
-```
-
 ### themis-notice 
 ```
 notices
